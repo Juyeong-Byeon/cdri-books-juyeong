@@ -4,7 +4,7 @@
 >
 > 카카오 Daum 책 검색 API를 연동한 도서 검색 및 찜하기 웹 애플리케이션을 구현하는 프로젝트입니다.
 >
-> 현재는 초기 앱 셸과 Zustand 저장소 모듈까지 구현되어 있습니다. 검색·찜 UI와 API 연동은 아직 구현 전이며, 아래 기능·아키텍처 설명은 별도 표시가 없는 한 구현 목표를 뜻합니다.
+> 현재 구현 범위는 5절에서 확인할 수 있습니다. 아래 기능·아키텍처 설명은 별도 표시가 없는 한 구현 목표를 뜻합니다.
 
 ---
 
@@ -146,7 +146,7 @@ npm run preview
 
 ## 5. 폴더 구조 및 주요 코드 설명
 
-현재 구현된 기본 앱 셸과 Zustand 저장소를 보여줍니다. 도서 검색·찜 화면 UI와 API 연동은 아직 구현하지 않았습니다.
+기본 앱 셸, Zustand 저장소, 검색 입력과 빈 결과 UI를 구현했습니다. 검색 API 연동과 찜 목록 UI는 후속 구현 대상입니다.
 
 ```text
 cdri-books-juyeong/
@@ -158,15 +158,26 @@ cdri-books-juyeong/
 ├── public/
 │   └── _redirects            # Cloudflare Pages 라우팅 및 폴백 설정
 ├── src/
-│   ├── app/providers/
+│   ├── providers/
 │   │   ├── ContentErrorBoundary.tsx # 콘텐츠 렌더링 오류 복구 경계
 │   │   └── RootProvider.tsx         # BrowserRouter와 React Query 설정
-│   ├── components/layout/
-│   │   ├── AppHeader.tsx            # 브랜드 링크와 React Router 내비게이션
-│   │   └── AppShell.tsx             # 공통 레이아웃과 콘텐츠 렌더링 경계
+│   ├── components/
+│   │   ├── layout/                 # AppHeader, AppShell, PageLayout
+│   │   └── ui/                     # shadcn 기반 Button, Input, InputGroup, Empty
+│   ├── lib/
+│   │   ├── typography.ts           # Tailwind와 cx가 공유하는 타이포그래피 정의
+│   │   └── utils.ts                # 클래스 병합 유틸리티 cx
 │   ├── pages/
-│   │   ├── FavoritesPage.tsx        # 찜 화면 기본 셸
-│   │   └── SearchPage.tsx           # 검색 화면 기본 셸
+│   │   ├── favorites/
+│   │   │   └── Page.tsx            # 찜 페이지 진입 컴포넌트
+│   │   └── search/
+│   │       ├── Page.tsx            # 검색 페이지 레이아웃 조합
+│   │       ├── components/
+│   │       │   ├── BookSearchBar.tsx
+│   │       │   ├── SearchResultCount.tsx
+│   │       │   └── SearchEmptyState.tsx
+│   │       └── assets/
+│   │           └── empty-search.svg
 │   ├── stores/
 │   │   ├── favorites/
 │   │   │   └── store.ts              # 찜한 Book 스냅샷 Zustand 저장소

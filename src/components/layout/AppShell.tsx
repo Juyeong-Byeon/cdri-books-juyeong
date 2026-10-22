@@ -8,9 +8,9 @@ export function AppShell() {
   const currentSearch = location.search;
 
   return (
-    <div className={cx('min-h-screen bg-palette-white text-text-primary')}>
+    <div className={cx('flex min-h-screen flex-col bg-palette-white text-text-primary')}>
       <AppHeader currentSearch={currentSearch} />
-      <main className={cx('mx-auto max-w-5xl px-4 py-8')}>
+      <main className={cx('w-full flex-1')}>
         <ContentErrorBoundary key={location.pathname}>
           <Outlet />
         </ContentErrorBoundary>

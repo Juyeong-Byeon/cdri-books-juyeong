@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 import { AppShell } from './components/layout/AppShell';
-import { FavoritesPage } from './pages/FavoritesPage';
-import { SearchPage } from './pages/SearchPage';
+import { Page as FavoritesPage } from './pages/favorites/Page';
+import { Page as SearchPage } from './pages/search/Page';
 
 export function App() {
   return (

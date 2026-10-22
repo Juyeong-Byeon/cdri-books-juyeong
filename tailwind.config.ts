@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { typography } from './src/lib/typography';
 
 export default {
   darkMode: ['class'],
@@ -23,16 +24,7 @@ export default {
       fontFamily: {
         sans: ['Noto Sans KR', 'sans-serif'],
       },
-      fontSize: {
-        title1: ['24px', { lineHeight: '24px', fontWeight: '700' }],
-        title2: ['22px', { lineHeight: '24px', fontWeight: '700' }],
-        title3: ['18px', { lineHeight: '18px', fontWeight: '700' }],
-        body1: ['20px', { lineHeight: '20px', fontWeight: '500' }],
-        body2: ['14px', { lineHeight: '14px', fontWeight: '500' }],
-        'body2-bold': ['14px', { lineHeight: '14px', fontWeight: '700' }],
-        caption: ['16px', { lineHeight: '16px', fontWeight: '500' }],
-        small: ['10px', { lineHeight: '10px', fontWeight: '500' }],
-      },
+      fontSize: typography,
       borderRadius: {
         lg: '12px',
         md: '8px',

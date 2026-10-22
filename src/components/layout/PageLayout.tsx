@@ -9,11 +9,14 @@ export function PageLayout({ title, children }: PageLayoutProps) {
   const titleId = useId();
 
   return (
-    <section aria-labelledby={titleId} className={cx('mx-auto max-w-3xl py-12')}>
+    <section
+      aria-labelledby={titleId}
+      className={cx('mx-auto w-[calc(100%_-_48px)] max-w-[960px] pb-16 pt-[104px]')}
+    >
       <h1 id={titleId} className={cx('text-title2 text-text-primary')}>
         {title}
       </h1>
-      <div className={cx('mt-3')}>{children}</div>
+      <div className={cx('mt-5')}>{children}</div>
     </section>
   );
 }

@@ -1,4 +1,5 @@
 import { Component, type PropsWithChildren, type ReactNode } from 'react';
+import { Button } from '../components/ui/Button';
 import { cx } from '../lib/utils';
 
 interface ContentErrorBoundaryState {
@@ -30,15 +31,9 @@ export class ContentErrorBoundary extends Component<PropsWithChildren, ContentEr
           <p className={cx('mt-3 text-body2 text-text-secondary')}>
             다시 시도하거나 상단 메뉴에서 다른 화면으로 이동해 주세요.
           </p>
-          <button
-            type="button"
-            onClick={this.reset}
-            className={cx(
-              'mt-6 rounded-md bg-palette-primary px-5 py-3 text-body2 font-bold text-palette-white'
-            )}
-          >
+          <Button type="button" onClick={this.reset} className={cx('mt-6')}>
             다시 시도
-          </button>
+          </Button>
         </section>
       );
     }
