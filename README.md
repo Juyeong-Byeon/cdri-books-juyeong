@@ -112,18 +112,20 @@ colors: {
 - Node.js `v22.x` (Active LTS 권장, `.nvmrc` 기준 `v22.23.2`)
 - npm `10.x` 이상 또는 pnpm
 
-### 4.2 환경 변수 설정 (`.env`)
+### 4.2 환경 변수 설정 (`.env.dev`)
 
-프로젝트 루트 경로에 `.env` 파일을 생성하고 발급받은 카카오 REST API 키를 입력합니다.
+프로젝트 루트의 `.env.example`을 `.env.dev`로 복사하고 발급받은 카카오 REST API 키를 입력합니다.
 
-> ⚠️ `.env` 파일은 `.gitignore`에 등록되어 GitHub 저장소에 커밋되지 않습니다.
+> ⚠️ `.env.dev` 파일은 `.gitignore`에 등록되어 GitHub 저장소에 커밋되지 않습니다.
 
 ```bash
-# .env
+# .env.dev
 KAKAO_REST_API_KEY=your_kakao_rest_api_key_here
 ```
 
-이 키는 Vite 개발 프록시와 Cloudflare Pages Function에서만 사용하도록 구성할 계획입니다. 프런트엔드 코드나 `import.meta.env`에서 읽지 않습니다. 배포 시 Cloudflare Pages 프로젝트의 secret 변수에도 같은 이름(`KAKAO_REST_API_KEY`)으로 등록합니다. API 프록시 경로와 환경별 설정은 [ADR-0005](./docs/adr/0005-cors-proxy-cloudflare-pages.md)를 기준으로 후속 구현합니다.
+`npm run dev`는 Vite를 `dev` 모드로 실행해 `.env.dev`를 읽습니다. 키를 변경하면 개발 서버를 재시작합니다. 키는 개발 서버가 카카오 요청의 인증 헤더를 구성할 때만 사용하며, 프런트엔드 코드나 `import.meta.env`에서 읽지 않습니다. 배포 시 Cloudflare Pages 프로젝트의 secret 변수에도 같은 이름(`KAKAO_REST_API_KEY`)으로 등록합니다.
+
+개발·배포 모두 `GET /api/books`를 사용하며, 개발 프록시는 검색 쿼리를 유지한 채 카카오 `/v3/search/book`으로 전달합니다. 검색어 입력 후 Enter를 누르거나 상세검색에서 제목·저자명·출판사를 선택해 검색할 수 있습니다. 프록시의 설계 기준은 [ADR-0005](./docs/adr/0005-cors-proxy-cloudflare-pages.md)를 참고합니다.
 
 ### 4.3 설치 및 실행
 
@@ -146,7 +148,7 @@ npm run preview
 
 ## 5. 폴더 구조 및 주요 코드 설명
 
-기본 앱 셸, Zustand 저장소, 검색 입력과 빈 결과 UI를 구현했습니다. 검색 API 연동과 찜 목록 UI는 후속 구현 대상입니다.
+기본 앱 셸, Zustand 저장소, 카카오 도서 검색 API 연동, 상세검색, URL 조건 복원, 10권 단위 무한 스크롤, 도서 상세 펼침 및 로딩·빈 결과·오류 UI를 구현했습니다. 검색 전에는 API를 호출하지 않습니다. 찜 목록 페이지와 최근 검색 기록 UI, 실제 배포 검색 검증은 후속 작업입니다.
 
 ```text
 cdri-books-juyeong/
@@ -163,7 +165,8 @@ cdri-books-juyeong/
 │   │   └── RootProvider.tsx         # BrowserRouter와 React Query 설정
 │   ├── components/
 │   │   ├── layout/                 # AppHeader, AppShell, PageLayout
-│   │   └── ui/                     # shadcn 기반 Button, Input, InputGroup, Empty
+│   │   ├── features/book/          # 공통 도서 목록·카드·표지·Skeleton 및 표시 유틸리티
+│   │   └── ui/                     # shadcn 기반 UI와 도메인 중립 ExpandableCard
 │   ├── lib/
 │   │   ├── typography.ts           # Tailwind와 cx가 공유하는 타이포그래피 정의
 │   │   └── utils.ts                # 클래스 병합 유틸리티 cx
@@ -174,8 +177,12 @@ cdri-books-juyeong/
 │   │       ├── Page.tsx            # 검색 페이지 레이아웃 조합
 │   │       ├── components/
 │   │       │   ├── BookSearchBar.tsx
+│   │       │   ├── AdvancedSearchPopover.tsx
 │   │       │   ├── SearchResultCount.tsx
-│   │       │   └── SearchEmptyState.tsx
+│   │       │   ├── SearchEmptyState.tsx
+│   │       │   └── SearchErrorState.tsx
+│   │       ├── hooks/              # use-book-search, use-load-more
+│   │       ├── utils/search-params.ts # URL 검색 조건 파싱·직렬화
 │   │       └── assets/
 │   │           └── empty-search.svg
 │   ├── stores/
@@ -185,7 +192,12 @@ cdri-books-juyeong/
 │   │   │   └── store.ts              # 최근 검색어 Zustand 저장소
 │   │   └── util/
 │   │       └── safe-local-storage.ts # 저장소 접근 실패를 격리하는 persist 어댑터
-│   ├── types/domain/book.ts         # 도서 도메인 모델
+│   ├── services/
+│   │   ├── books.ts                # /api/books 요청과 HTTP 오류 처리
+│   │   └── mappers/book-mapper.ts   # Kakao DTO → Book·페이지 메타데이터
+│   ├── types/
+│   │   ├── domain/                 # Book·검색 조건·페이지 모델
+│   │   └── dto/kakao-book.ts        # 카카오 응답 타입
 │   ├── App.tsx                      # React Router 경로 선언
 │   ├── App.test.tsx                 # 기본 내비게이션 동작 테스트
 │   ├── main.tsx                     # 앱 엔트리포인트
@@ -200,6 +212,11 @@ cdri-books-juyeong/
 - **`RootProvider.tsx`**: 앱 수명 동안 유지되는 QueryClient와 BrowserRouter를 제공합니다. 재시도는 네트워크 오류와 5xx로 제한합니다.
 - **`AppHeader.tsx`**: 브랜드와 검색·찜 내비게이션을 렌더링하며 현재 URL 검색 조건을 경로 이동에 보존합니다.
 - **`AppShell.tsx`**: 공통 레이아웃을 제공하고 콘텐츠 영역만 렌더링 ErrorBoundary로 감쌉니다.
+- **`BookList.tsx` / `BookCardItem.tsx`**: API 도서 목록, 독립적인 상세 펼침, 찜 저장소 연결, 새 탭 구매 링크를 제공합니다. 최초 요청은 카드 Skeleton, 추가 요청은 기존 목록과 높이가 일정한 하단 로딩 표시를 사용합니다. 새 행·표지에 짧은 등장 효과를 적용하며 동작 줄이기 설정을 따릅니다.
+- **`ExpandableCard.tsx`**: 도서 모델에 의존하지 않고 미디어·제목·상세·액션 슬롯을 배치합니다. Radix Collapsible로 상세 토글의 키보드 조작과 ARIA 연결을 구성합니다.
+- **`BookCover.tsx`**: 기본 48×68px·확대 210×280px 공간을 확보하며 이미지 로딩 Skeleton과 빈 표지·로드 실패 대체 표시를 처리합니다.
+- **`use-book-search.ts`**: URL에서 읽은 확정 조건을 쿼리 키로 사용합니다. React Query가 페이지·취소·캐시를 관리하고, 훅에서 중복 도서를 제거해 뷰에 전달합니다. 추가 페이지 오류가 발생하면 기존 결과를 유지하고 명시적인 재시도를 기다립니다.
+- **`book-mapper.ts`**: 유효한 ISBN-13·ISBN-10 또는 URL로 ID를 만들고, 미제공 가격을 `null`로 변환해 0원과 구분합니다. 가격·저자 표시 형식은 카드의 표시 유틸리티에서 처리합니다.
 - **Zustand 저장소**: 찜 도서는 저장 시점의 스냅샷으로 보관하고, 최근 검색어는 중복을 맨 앞으로 이동해 최대 8개까지 저장합니다. 손상된 저장 데이터와 localStorage 접근 실패가 앱 중단 원인이 되지 않도록 처리합니다.
 
 ---

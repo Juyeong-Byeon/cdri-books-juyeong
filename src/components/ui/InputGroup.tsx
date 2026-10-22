@@ -8,7 +8,7 @@ function InputGroup({ className, ...props }: ComponentProps<'div'>) {
       data-slot="input-group"
       role="group"
       className={cx(
-        'group/input-group relative flex h-12 w-full min-w-0 items-center rounded-full border border-transparent bg-palette-lightGray transition-shadow',
+        'group/input-group relative flex h-12 w-full min-w-0 items-center overflow-hidden rounded-full border border-transparent bg-palette-lightGray transition-shadow',
         'has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-palette-primary',
         'has-[[data-slot=input-group-control][aria-invalid=true]]:border-palette-red has-[[data-slot=input-group-control][aria-invalid=true]]:ring-palette-red',
         className

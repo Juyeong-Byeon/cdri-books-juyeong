@@ -16,7 +16,7 @@ API 키를 Git에 커밋하지 않는 것과 브라우저에 전달하지 않는
 - 개발은 Vite 서버 프록시, 배포는 `functions/api/books.ts`의 Cloudflare Pages Function으로 처리한다.
 - 서버의 업스트림은 `https://dapi.kakao.com/v3/search/book`으로 고정한다.
 - 경로만 변환하고 URL 인코딩된 `query`, `target`, `sort`, `page`, `size`를 보존한다. 필수값과 허용값은 검증한다.
-- 로컬에서는 서버 전용 `KAKAO_REST_API_KEY`를 환경 또는 Git에서 제외된 `.env`로 주입한다. 배포에서는 Cloudflare secret 바인딩으로 제공한다.
+- 로컬에서는 서버 전용 `KAKAO_REST_API_KEY`를 환경 또는 Git에서 제외된 `.env.dev`로 주입한다. `npm run dev`는 Vite의 `dev` 모드로 해당 파일을 읽는다. 배포에서는 Cloudflare secret 바인딩으로 제공한다.
 - 키를 `VITE_` 변수, 클라이언트 코드, URL, 응답, 로그에 포함하지 않는다. 키가 없으면 명시적인 구성 오류를 반환한다.
 - 개발·배포의 정상 응답과 오류 의미를 맞추고, HTTP 상태를 클라이언트가 구별할 수 있게 한다.
 - 배포 환경에서 실제 검색과 추가 페이지 로딩까지 검증한다. 정적 빌드 성공만으로 API 연동 완료로 판단하지 않는다.

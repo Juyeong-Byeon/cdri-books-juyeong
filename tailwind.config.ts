@@ -20,11 +20,24 @@ export default {
           secondary: '#6D7582',
           subtitle: '#8D94A0',
         },
+        ui: {
+          divider: '#D2D6DA',
+          gray: '#B1B8C0',
+        },
       },
       fontFamily: {
         sans: ['Noto Sans KR', 'sans-serif'],
       },
       fontSize: typography,
+      keyframes: {
+        'book-row-enter': {
+          from: { opacity: '0', transform: 'translateY(6px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'book-row-enter': 'book-row-enter 180ms ease-out',
+      },
       borderRadius: {
         lg: '12px',
         md: '8px',

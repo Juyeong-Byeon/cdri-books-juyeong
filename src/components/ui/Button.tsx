@@ -12,10 +12,19 @@ const buttonVariants = cva(
           'rounded-sm bg-palette-primary text-body2-bold text-palette-white hover:bg-palette-primary/90',
         outline:
           'rounded-md border border-palette-gray bg-palette-white text-body2 text-text-secondary hover:border-palette-primary hover:text-palette-primary',
+        secondary:
+          'rounded-md bg-palette-lightGray text-caption text-text-secondary hover:bg-palette-gray/60',
+        ghost: 'bg-transparent text-palette-white',
+        'muted-ghost': 'bg-transparent text-ui-gray hover:text-text-secondary',
       },
       size: {
         default: 'h-12 px-5',
         sm: 'h-8 px-3',
+        list: 'h-12 w-[115px] shrink-0 rounded-md px-5 text-caption',
+        'icon-sm': 'size-4 p-0',
+        icon: 'size-8 p-0 [&_svg]:size-6',
+        'icon-close': 'size-5 p-0 [&_svg]:size-5',
+        search: 'h-10 rounded-md px-5 text-caption',
       },
     },
     defaultVariants: {

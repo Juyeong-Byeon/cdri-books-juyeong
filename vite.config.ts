@@ -17,10 +17,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       proxy: {
-        '/api/search/book': {
+        '/api/books': {
           target: 'https://dapi.kakao.com',
           changeOrigin: true,
-          rewrite: () => '/v3/search/book',
+          rewrite: (path) => path.replace(/^\/api\/books(?=\?|$)/, '/v3/search/book'),
           configure: (proxy) => {
             proxy.on('proxyReq', (proxyReq) => {
               if (kakaoApiKey) {
