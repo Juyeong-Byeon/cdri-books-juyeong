@@ -1,151 +1,46 @@
-# ADR-0008: 코드 품질 및 커밋 규약 보증을 위한 Git Hooks & CI/CD 파이프라인 스펙
+# ADR-0008: Git Hooks와 GitHub Actions를 통한 반복 검증
 
-- **상태 (Status)**: 승인 (Accepted)
-- **일자 (Date)**: 2026-10-22
-- **결정자 (Deciders)**: 변주영
+- **상태**: 승인 (Accepted)
+- **결정·개정 일자**: 2026-10-22
+- **결정자**: 변주영
 
----
+## 배경
 
-## 1. 배경 및 맥락 (Context)
+개발 중 빠르게 오류를 확인하고 제출 시 동일한 명령으로 검증할 수 있어야 한다. 로컬 훅만으로 제출 품질을 판단하지 않고 CI에서도 타입·포맷·린트·테스트·빌드를 확인한다.
 
-개발 과정에서 발생할 수 있는 정적 타입 불일치, 린트 룰 위반, 코드 포맷팅 불일치, 테스트 실패뿐만 아니라, **일관성 없고 모호한 커밋 메시지 작성**을 방지해야 합니다. 이를 위해 Git Hooks 생명주기에 **Commitlint(Conventional Commits 규칙 강제)**를 포함하여 히스토리의 가독성과 추적성을 프로덕션 수준으로 보장합니다.
+## 결정
 
----
-
-## 2. 도구 체인 (Toolchain) 스펙
-
-| 검사 영역                 | 도구 (Tool)                                                           |   버전   | 역할                                                              |
-| :------------------------ | :-------------------------------------------------------------------- | :------: | :---------------------------------------------------------------- |
-| **Commit Message Linter** | **Commitlint** (`@commitlint/cli`, `@commitlint/config-conventional`) | `^19.x`  | Conventional Commits 규칙(`feat:`, `fix:` 등) 준수 강제           |
-| **Git Hooks Manager**     | **Husky**                                                             |  `^9.x`  | Git 훅(`commit-msg`, `pre-commit`, `pre-push`) 생명주기 관리      |
-| **Staged Linting**        | **lint-staged**                                                       | `^15.x`  | Git Staged 상태의 변경된 파일만 타깃으로 고속 검사                |
-| **Type Check**            | **TypeScript Compiler (`tsc`)**                                       | `~5.7.x` | `--noEmit` 옵션을 통한 전체 정적 타입 정합성 검사                 |
-| **Linter**                | **ESLint**                                                            |  `^9.x`  | 코드 안티패턴 및 React Hooks 규칙 강제 (`--max-warnings 0`)       |
-| **Formatter**             | **Prettier**                                                          |  `^3.x`  | 일관된 코드 스타일 포맷팅 및 충돌 방지 (`eslint-config-prettier`) |
-| **Test Runner**           | **Vitest**                                                            |  `^3.x`  | Vite 기반 초고속 단위 및 컴포넌트 테스트 실행                     |
-| **Test Environment**      | **JSDOM + React Testing Library**                                     |   최신   | 브라우저 DOM 환경 모킹 및 사용자 중심 컴포넌트 테스팅             |
-| **CI Platform**           | **GitHub Actions**                                                    |    -     | PR 및 main 푸시 시 자동 검증 워크플로우 실행                      |
-| **CD Platform**           | **Cloudflare Pages**                                                  |    -     | 엣지 기반 글로벌 정적 호스팅 및 서버리스 프록시 배포              |
-
----
-
-## 3. Git Hooks 세부 스펙
-
-```mermaid
-flowchart TD
-    subgraph CommitMsg["git commit (commit-msg hook)"]
-        CM["commitlint --edit $1 (Conventional Commits 규칙 검증)"]
-    end
-
-    subgraph PreCommit["git commit (pre-commit hook)"]
-        A["1. lint-staged"] -->|*.ts, *.tsx| B["eslint --fix & prettier --write"]
-        A -->|*.json, *.css, *.md| C["prettier --write"]
-        B --> D["2. typecheck (tsc --noEmit)"]
-        C --> D
-    end
-
-    subgraph PrePush["git push (pre-push hook)"]
-        E["npm run test:run (vitest run)"]
-    end
-```
-
-### 3.1 `commit-msg` Hook 스펙 (⭐️ 신규 추가)
-
-- **목적**: 커밋 메시지가 표준 `Conventional Commits` 명세를 따르는지 검증.
-- **실행 트리거**: `git commit` 후 메시지 작성 시점
-- **실행 명령**: `npx --no -- commitlint --edit "$1"`
-- **허용 커밋 타입**:
-  - `feat`: 새로운 기능 추가
-  - `fix`: 버그 수정
-  - `docs`: 문서 변경 (README, ADR 등)
-  - `style`: 코드 스타일/포맷 변경 (동작 영향 없음)
-  - `refactor`: 코드 리팩터링
-  - `test`: 테스트 코드 추가 및 수정
-  - `chore`: 빌드 스크립트, 패키지 설정 변경
-  - `perf`: 성능 최적화
-- **예시**: `feat: implement book search infinite scroll` (규칙 미준수 시 커밋 거절)
-
-### 3.2 `pre-commit` Hook 스펙
-
-- **목적**: 변경된 파일의 린트/포맷팅 오류 및 전체 프로젝트 타입 오류 차단.
-- **실행 단계**:
-  1. **`npx lint-staged`**:
-     - `*.{ts,tsx}` ➔ `eslint --fix` 적용 후 `prettier --write`
-     - `*.{json,css,md,html}` ➔ `prettier --write`
-  2. **`npm run typecheck`** (`tsc --noEmit`):
-     - 정적 타입 오류 발생 시 커밋 즉시 중단.
-
-### 3.3 `pre-push` Hook 스펙
-
-- **목적**: 원격 저장소 전송 전 단위/컴포넌트 테스트 전수 검증.
-- **실행 단계**:
-  - **`npm run test:run`** (`vitest run`):
-    - 테스트 실패 시 푸시 즉시 거절.
-
----
-
-## 4. GitHub Actions CI/CD 파이프라인 스펙
-
-### 4.1 워크플로우 명세 (`.github/workflows/ci.yml`)
-
-- **트리거 조건**:
-  - `push`: `main` 브랜치
-  - `pull_request`: `main` 브랜치 대상 모든 PR
-- **실행 런타임**: `ubuntu-latest`, **Node.js `v22.x` (LTS)**
-
-### 4.2 파이프라인 단계 (CI Pipeline Jobs)
+- 기존 Husky, lint-staged, Commitlint, ESLint, Prettier, TypeScript 구성을 유지한다.
+- 커밋 메시지는 Conventional Commits를 사용한다. pre-commit에서는 변경 파일의 린트·포맷과 타입 검사를 수행한다.
+- GitHub Actions의 main 푸시와 PR 검증은 다음 명령을 사용한다.
 
 ```text
-1. Checkout Repository (actions/checkout@v4)
-2. Setup Node.js (actions/setup-node@v4 with cache: 'npm', node-version: 22)
-3. Install Dependencies (npm ci)
-4. Run Typecheck (npm run typecheck)
-5. Run Format Check (npm run format:check)
-6. Run Lint (npm run lint)
-7. Run Unit & Component Tests (npm run test:run)
-8. Run Production Build (npm run build)
+npm ci
+npm run typecheck
+npm run format:check
+npm run lint
+npm run test:run
+npm run build
 ```
 
----
+- 테스트 도구와 범위는 [ADR-0012](./0012-testing-and-deployment-validation.md)를 따른다. 테스트가 0개인 실행을 기능 검증 통과로 보지 않는다.
+- `build`는 현재 타입 검사도 포함한다. CI 단계는 실패 원인을 분리해서 확인할 수 있게 유지한다.
+- Cloudflare 배포 환경 검증은 별도로 수행한다. GitHub Actions 설정이 있다는 이유만으로 자동 배포까지 구성됐다고 기록하지 않는다.
 
-## 5. 설정 파일 스펙 예시
+## 대안과 선택 이유
 
-### 5.1 `commitlint.config.js`
+| 대안                     | 평가                                                        |
+| ------------------------ | ----------------------------------------------------------- |
+| 로컬 수동 검사만 수행    | 구성이 적지만 검사 누락과 개발 환경 차이를 발견하기 어렵다. |
+| 로컬 훅만 필수화         | 빠른 피드백을 주지만 훅 미설치·우회 가능성이 있다.          |
+| 기존 훅과 CI 유지 (선택) | 개발 중 피드백과 제출 전 반복 검증을 함께 확보한다.         |
 
-```javascript
-export default {
-  extends: ['@commitlint/config-conventional'],
-  rules: {
-    'type-enum': [
-      2,
-      'always',
-      ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore', 'perf'],
-    ],
-    'subject-case': [0],
-  },
-};
-```
+## 결과와 트레이드오프
 
-### 5.2 `package.json` 스크립트 명세
+타입 검사가 커밋·CI·빌드에서 중복될 수 있다. 이 과제에서는 검사 속도와 실패 위치를 확인한 후 필요한 경우 조정한다.
 
-```json
-{
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0",
-    "lint:fix": "eslint . --fix",
-    "format:check": "prettier --check .",
-    "format:write": "prettier --write .",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
-    "*.{json,css,md,html}": ["prettier --write"]
-  }
-}
-```
+현재 pre-push에는 `--passWithNoTests`가 있어 테스트가 없는 초기 저장소의 푸시는 허용한다. 이는 기능 검증 통과가 아니다. CI의 `npm run test:run`에는 이 옵션이 없으므로 테스트가 없으면 실패한다. 이 ADR 개정에서는 훅·CI·스크립트를 변경하지 않는다.
+
+## 구현 시 확인
+
+전체 검증 명령이 실제 테스트를 실행하고, 실패 시 0이 아닌 종료 코드를 반환하는지 확인한다. 배포 결과는 CI 성공과 별도로 기록한다.

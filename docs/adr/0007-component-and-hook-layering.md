@@ -1,75 +1,47 @@
-# ADR-0007: 도메인 중립 뷰 컴포넌트 계층 분리 및 훅 응답 캡슐화 설계
+# ADR-0007: 범용 UI·도메인 바인딩 분리와 검색 훅 인터페이스
 
-- **상태 (Status)**: 승인 (Accepted)
-- **일자 (Date)**: 2026-10-22
-- **결정자 (Deciders)**: 변주영
+- **상태**: 승인 (Accepted)
+- **결정·개정 일자**: 2026-10-22
+- **결정자**: 변주영
 
----
+## 배경
 
-## 1. 배경 및 맥락 (Context)
+검색 결과와 찜 목록은 도서 카드 구조를 공유하지만 데이터를 얻는 방식은 다르다. 이번 과제에서는 범용 카드와 도메인 바인딩을 분리해 UI 자체와 상태 연결을 각각 검토·테스트할 수 있도록 한다.
 
-컴포넌트가 도메인 모델(`Book` 등)에 직접 의존하면, 디자인 시스템 레벨의 컴포넌트 재사용성이 크게 떨어지고 다른 도메인이나 화면에서 재활용하기 어려워집니다. 또한 커스텀 훅이 TanStack Query의 방대한 내부 객체(`data`, `fetchNextPage`, `refetch`, `isFetching` 등)를 그대로 UI 컴포넌트로 전달하면 컴포넌트가 훅의 내부 구현 세부사항에 과도하게 결합(Tight Coupling)되는 문제가 발생합니다.
+## 결정
 
----
+- `src/components/ui/`는 `Book`, Zustand, API 모듈에 의존하지 않는다.
+- `ExpandableCard`는 펼침 상태·토글·콘텐츠·액션 슬롯을 받는 범용 레이아웃과 접근성 동작을 담당한다. ISBN·찜 저장·가격 계산을 알지 않는다.
+- `src/components/features/`의 `BookCardItem`은 `Book`을 받아 제목·표지·가격 표현과 찜 액션·구매 링크를 구성하고 범용 카드에 전달한다.
+- 검색과 찜 목록은 같은 도메인 바인딩 컴포넌트를 재사용한다.
+- `Button`, 입력 UI, Popover 등의 공통 요소는 실제 사용에 필요한 범위만 만든다. 사용하지 않는 변형과 범용 설정은 미리 추가하지 않는다.
+- 검색 훅은 Query의 페이지를 목록으로 구성하고 UI에 필요한 상태와 동작을 반환한다. 오류 종류·다음 페이지 실패·재시도 기능을 숨기지 않는다.
 
-## 2. 결정 내용 (Decision)
+### 검색 훅의 책임
 
-### 1) UI 컴포넌트 계층 분리 (Presentational vs Container)
+| 반환 정보                       | 의미                                                                |
+| ------------------------------- | ------------------------------------------------------------------- |
+| books, totalCount               | 정규화된 현재 검색 결과와 전체 건수                                 |
+| isIdle, isLoading, isEmpty      | 검색 전·최초 요청 중·성공 후 빈 결과 구분                           |
+| error, isError                  | 최초 요청 실패 또는 기존 데이터가 있는 갱신 실패 구분에 필요한 정보 |
+| hasNextPage, isFetchingNextPage | 추가 요청 가능 여부와 진행 상태                                     |
+| isFetchNextPageError            | 다음 페이지 요청 실패 여부                                          |
+| loadMore, retry                 | 추가 페이지 요청과 최초·갱신 요청 재시도                            |
+| retryNextPage                   | 기존 결과를 유지한 추가 페이지 재시도                               |
 
-컴포넌트를 **도메인 중립적 UI(Presentational)**와 **도메인 종속적 UI(Container/Feature)**의 2개 계층으로 철저히 분리합니다.
+`isIdle`은 제출된 유효한 검색 조건이 없는 상태로 정의한다. Query v5에서 비활성 쿼리의 `isPending`만 보고 로딩 UI를 표시하지 않는다. `isEmpty`는 유효한 검색이 성공하고 목록이 비었을 때만 참이다.
 
-```mermaid
-flowchart TD
-    subgraph FeatureLayer["도메인 종속 계층 (src/components/features/)"]
-        BookItemContainer["BookCardItem (도메인 로직 & 찜하기 바인딩)"]
-        SearchContainer["BookSearchSection (검색 상태 바인딩)"]
-    end
+오류 표시의 세부 규칙은 [ADR-0011](./0011-query-errors-and-render-boundary.md)을 따른다. 오류 처리를 위해 필요한 경우 훅 인터페이스를 확장하며, 반환 필드를 적게 만드는 것 자체를 목표로 삼지 않는다.
 
-    subgraph UILayer["도메인 중립 계층 (src/components/ui/)"]
-        ExpandableCard["ExpandableCard (순수 아코디언 카드)"]
-        SearchInput["SearchInput (순수 인풋 & 슬롯)"]
-        Button["Button / Badge / EmptyState"]
-    end
+## 대안과 선택 이유
 
-    BookItemContainer -->|원시 Props 주입| ExpandableCard
-    SearchContainer -->|원시 Props 주입| SearchInput
-```
+| 대안                                       | 평가                                                                                                  |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| BookCard가 도메인과 UI를 모두 담당         | 파일·props가 적어 작은 화면에서는 충분히 실용적이다.                                                  |
+| 범용 ExpandableCard + 도메인 바인딩 (선택) | 공통 UI를 독립 검증하고 검색·찜 카드의 연결 책임을 분리할 수 있다. 대신 계층과 props 전달이 늘어난다. |
 
-1. **도메인 중립 컴포넌트 (`src/components/ui/`)**:
-   - 도메인 인터페이스(`Book` 등)에 **일절 의존하지 않습니다**.
-   - 순수 원시값/독립 인터페이스 props(`title`, `subTitle`, `imageUrl`, `price`, `isExpanded`, `onToggle`, `actions` 등)만 받아 오직 스타일과 뷰 표현만 담당합니다.
-   - 예: `ExpandableCard`, `SearchInput`, `Button`, `EmptyState`, `Badge`, `Dropdown` 등.
-2. **도메인 종속 컴포넌트 (`src/components/features/`)**:
-   - `Book` 도메인 모델과 비즈니스 로직(찜하기 토글, 상세 펼침 상태, 링크 이동)을 주입받아, 순수 `ui/` 컴포넌트에 props를 매핑하여 조립(Composition)합니다.
-   - 예: `BookCardItem`, `BookSearchContainer`, `FavoriteBookContainer` 등.
+## 결과와 트레이드오프
 
----
+레이아웃 변경 시 두 계층을 함께 수정할 수 있고, 과도한 슬롯·props는 가독성을 해칠 수 있다. 명확한 경계와 독립 검증을 우선하되 모든 컴포넌트를 같은 형태로 분리하지는 않는다.
 
-### 2) 커스텀 훅의 응답 캡슐화 (Minimal & Expressive Hook Returns)
-
-커스텀 훅은 서드파티 라이브러리의 원시 상태를 그대로 누출하지 않고, **UI 컴포넌트가 렌더링에 꼭 필요한 인터페이스만 정제하여 반환**합니다.
-
-```typescript
-// ❌ 지양: React Query의 거대한 원본 객체를 그대로 노출
-const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, error } = useInfiniteQuery(...);
-
-// ✅ 지향: UI가 소비하기에 가장 직관적이고 꼭 필요한 데이터만 캡슐화하여 반환
-export interface UseBookSearchResult {
-  books: Book[];                 // pages가 평탄화(flatten)된 도서 목록
-  totalCount: number;            // 전체 검색 결과 건수
-  isLoading: boolean;            // 최초 검색 로딩 중
-  isFetchingNextPage: boolean;   // 스크롤 추가 로딩 중
-  hasNextPage: boolean;          // 추가 로딩 가능 여부
-  loadMore: () => void;          // fetchNextPage 대신 직관적인 명명
-  isEmpty: boolean;              // 검색 결과가 0건인지 여부
-  isError: boolean;              // 에러 발생 여부
-}
-```
-
----
-
-## 3. 결정의 결과 및 영향 (Consequences)
-
-- **높은 재사용성**: `ui/` 디렉터리의 컴포넌트들은 디자인 시스템 카탈로그(Storybook 등)에 등록 가능한 순수 UI 자산으로 격리됩니다.
-- **테스트 용이성**: 뷰 컴포넌트는 단순 props 전달만으로 시각적 회귀 및 스냅샷 테스트가 가능하며, 비즈니스 로직과 분리되어 테스트 복잡도가 극적으로 낮아집니다.
-- **클린 컴포넌트**: 컴포넌트 파일이 짧고 직관적이며, 훅과 컴포넌트 간의 책임(SRP)이 명확해집니다.
+범용 카드 테스트는 펼침·키보드·ARIA를 확인하고, 도메인 바인딩 테스트는 찜과 표시값 연결을 확인한다. 렌더링 횟수 감소나 파일 길이 감소를 자동으로 보장하지 않는다.
