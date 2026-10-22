@@ -27,8 +27,8 @@ export function ExpandableCard({
         className={cx(
           'grid gap-4 border-b border-ui-divider px-4 lg:pl-12',
           expanded
-            ? 'grid-cols-1 py-6 lg:grid-cols-[210px_minmax(0,1fr)_240px] lg:gap-8'
-            : 'grid-cols-[48px_minmax(0,1fr)] items-center py-4 lg:h-[100px] lg:grid-cols-[48px_minmax(0,1fr)_370px] lg:gap-x-12 lg:py-0'
+            ? 'grid-cols-1 py-6 lg:grid-cols-[max-content_minmax(0,1fr)_240px] lg:gap-8'
+            : 'grid-cols-[max-content_minmax(0,1fr)] items-center py-4 lg:h-[100px] lg:grid-cols-[max-content_minmax(0,1fr)_370px] lg:gap-x-12 lg:py-0'
         )}
       >
         <div className={cx('shrink-0', expanded && 'justify-self-center lg:justify-self-start')}>
