@@ -148,7 +148,7 @@ npm run preview
 
 ## 5. 폴더 구조 및 주요 코드 설명
 
-기본 앱 셸, Zustand 저장소, 카카오 도서 검색 API 연동, 상세검색, 최근 검색 기록 UI, URL 조건 복원, 10권 단위 무한 스크롤, 도서 상세 펼침 및 로딩·빈 결과·오류 UI를 구현했습니다. 검색 전에는 API를 호출하지 않습니다. 찜 목록 페이지와 실제 배포 검색 검증은 후속 작업입니다.
+기본 앱 셸, Zustand 저장소, 카카오 도서 검색 API 연동, 상세검색, 최근 검색 기록 UI, 찜 목록 페이지, URL 조건 복원, 10권 단위 무한 스크롤, 도서 상세 펼침 및 로딩·빈 결과·오류 UI를 구현했습니다. 검색 전과 찜 목록 페이지에서는 API를 호출하지 않습니다. 실제 배포 검색 검증은 후속 작업입니다.
 
 ```text
 cdri-books-juyeong/
@@ -165,26 +165,24 @@ cdri-books-juyeong/
 │   │   └── RootProvider.tsx         # BrowserRouter와 React Query 설정
 │   ├── components/
 │   │   ├── layout/                 # AppHeader, AppShell, PageLayout
-│   │   ├── features/book/          # 공통 도서 목록·카드·표지·Skeleton 및 표시 유틸리티
+│   │   ├── features/book/          # 공통 도서 목록·카드·표지·빈 화면·Skeleton 및 에셋·유틸리티
 │   │   └── ui/                     # shadcn 기반 UI와 도메인 중립 ExpandableCard
 │   ├── lib/
 │   │   ├── typography.ts           # Tailwind와 cx가 공유하는 타이포그래피 정의
 │   │   └── utils.ts                # 클래스 병합 유틸리티 cx
 │   ├── pages/
 │   │   ├── favorites/
-│   │   │   └── Page.tsx            # 찜 페이지 진입 컴포넌트
+│   │   │   ├── Page.tsx            # 찜 페이지 레이아웃 조합
+│   │   │   └── components/         # 찜 건수와 저장된 도서 목록·빈 화면
 │   │   └── search/
 │   │       ├── Page.tsx            # 검색 페이지 레이아웃 조합
 │   │       ├── components/
 │   │       │   ├── BookSearchBar.tsx
 │   │       │   ├── AdvancedSearchPopover.tsx
 │   │       │   ├── SearchResultCount.tsx
-│   │       │   ├── SearchEmptyState.tsx
 │   │       │   └── SearchErrorState.tsx
 │   │       ├── hooks/              # use-book-search, use-load-more
-│   │       ├── utils/search-params.ts # URL 검색 조건 파싱·직렬화
-│   │       └── assets/
-│   │           └── empty-search.svg
+│   │       └── utils/search-params.ts # URL 검색 조건 파싱·직렬화
 │   ├── stores/
 │   │   ├── favorites/
 │   │   │   └── store.ts              # 찜한 Book 스냅샷 Zustand 저장소
@@ -212,7 +210,7 @@ cdri-books-juyeong/
 - **`RootProvider.tsx`**: 앱 수명 동안 유지되는 QueryClient와 BrowserRouter를 제공합니다. 재시도는 네트워크 오류와 5xx로 제한합니다.
 - **`AppHeader.tsx`**: 브랜드와 검색·찜 내비게이션을 렌더링하며 현재 URL 검색 조건을 경로 이동에 보존합니다.
 - **`AppShell.tsx`**: 공통 레이아웃을 제공하고 콘텐츠 영역만 렌더링 ErrorBoundary로 감쌉니다.
-- **`BookList.tsx` / `BookCardItem.tsx`**: API 도서 목록, 독립적인 상세 펼침, 찜 저장소 연결, 새 탭 구매 링크를 제공합니다. 최초 요청은 카드 Skeleton, 추가 요청은 기존 목록과 높이가 일정한 하단 로딩 표시를 사용합니다. 새 행·표지에 짧은 등장 효과를 적용하며 동작 줄이기 설정을 따릅니다.
+- **`BookList.tsx` / `BookCardItem.tsx`**: 검색 결과와 찜 스냅샷 목록, 독립적인 상세 펼침, 찜 저장소 연결, 새 탭 구매 링크를 제공합니다. 최초 요청은 카드 Skeleton, 추가 요청은 기존 목록과 높이가 일정한 하단 로딩 표시를 사용합니다. 새 행·표지에 짧은 등장 효과를 적용하며 동작 줄이기 설정을 따릅니다.
 - **`ExpandableCard.tsx`**: 도서 모델에 의존하지 않고 미디어·제목·상세·액션 슬롯을 배치합니다. Radix Collapsible로 상세 토글의 키보드 조작과 ARIA 연결을 구성합니다.
 - **`BookCover.tsx`**: 기본 48×68px·확대 210×280px 공간을 확보하며 이미지 로딩 Skeleton과 빈 표지·로드 실패 대체 표시를 처리합니다.
 - **`use-book-search.ts`**: URL에서 읽은 확정 조건을 쿼리 키로 사용합니다. React Query가 페이지·취소·캐시를 관리하고, 훅에서 중복 도서를 제거해 뷰에 전달합니다. 추가 페이지 오류가 발생하면 기존 결과를 유지하고 명시적인 재시도를 기다립니다.
@@ -257,6 +255,7 @@ cdri-books-juyeong/
 - **스냅샷 보관 정책**: 찜하기 버튼을 누른 **그 시점의 도서 데이터(제목, 가격, 표지 등)를 스냅샷 형태로 보관**합니다. 따라서 이후 카카오 API의 실시간 응답 데이터가 변동되더라도 찜한 시점의 데이터가 보존됩니다.
 - **영속성**: 브라우저를 닫거나 재시작한 후에도 찜한 도서 목록을 `localStorage`에서 복원합니다.
 - **동기화**: [도서 검색] 화면과 [내가 찜한 책] 화면은 같은 찜 저장소를 사용합니다.
+- **찜 목록 화면**: 저장된 도서 건수와 카드를 표시하며 상세 펼침·구매·찜 해제를 지원합니다. 마지막 도서를 해제하면 건수가 0으로 갱신되고, 공통 도서 아이콘과 `찜한 책이 없습니다.` 안내를 표시합니다.
 
 ---
 

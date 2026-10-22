@@ -1,4 +1,5 @@
 import { BookCardItem } from '@/components/features/book/BookCardItem';
+import { BookEmptyState } from '@/components/features/book/BookEmptyState';
 import { BookList, BookListItem } from '@/components/features/book/BookList';
 import { BookListSkeleton } from '@/components/features/book/BookListSkeleton';
 import { cx } from '@/lib/utils';
@@ -6,7 +7,6 @@ import { BOOK_PAGE_SIZE } from '@/types/domain/book-search';
 import { useBookSearch } from '../hooks/use-book-search';
 import { useLoadMore } from '../hooks/use-load-more';
 import { useSearchConditions } from '../hooks/use-search-conditions';
-import { SearchEmptyState } from './SearchEmptyState';
 import { SearchErrorState } from './SearchErrorState';
 import { SearchLoadMore } from './SearchLoadMore';
 import { SearchResultCount } from './SearchResultCount';
@@ -34,7 +34,7 @@ export function SearchResults() {
         />
       )}
       {search.isIdle || search.isEmpty ? (
-        <SearchEmptyState />
+        <BookEmptyState description="검색된 결과가 없습니다." />
       ) : (
         <BookList aria-busy={search.isLoading || search.isFetchingNextPage}>
           {search.isLoading ? (
