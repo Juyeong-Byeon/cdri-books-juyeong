@@ -6,17 +6,17 @@
 
 ## 확정한 결정과 근거 문서
 
-| 선택             | 확정 내용                                                                     | ADR                                                                                                  |
-| ---------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 1. 구현 범위     | 기본 기능·디자인·핵심 테스트에 URL 동기화를 필수로 포함                       | [0009](./0009-ux-resilience-and-testing-strategy.md), [0010](./0010-url-search-state-and-history.md) |
-| 2. 계층 분리     | ExpandableCard와 도메인 바인딩, DTO·도메인·매퍼를 별도 계층으로 유지          | [0006](./0006-dto-domain-mapping-layer.md), [0007](./0007-component-and-hook-layering.md)            |
-| 3. API 실행·배포 | Vite 프록시와 Cloudflare Functions 유지, /api/books 통일, 실제 배포 검색 검증 | [0005](./0005-cors-proxy-cloudflare-pages.md)                                                        |
-| 4. 영속 상태     | Zustand + persist로 찜 스냅샷과 최근 검색어 관리                              | [0004](./0004-client-state-zustand.md)                                                               |
-| 5. 오류          | API 오류는 React Query 상태 UI, ErrorBoundary는 렌더링 오류 담당              | [0011](./0011-query-errors-and-render-boundary.md)                                                   |
-| 6. 테스트        | Vitest·RTL·MSW 핵심 테스트와 실제 배포 검증, Playwright는 필수에서 제외       | [0012](./0012-testing-and-deployment-validation.md)                                                  |
-| 7. 방문 기록     | 검색 제출·탭 전환은 push, 탭 전환 시 검색 조건 유지, 스크롤은 URL에서 제외    | [0010](./0010-url-search-state-and-history.md)                                                       |
-| 8. 상세검색 UI   | 버튼 아래 Popover와 검색 대상 선택, 제출 시 적용, Esc와 포커스 복귀           | [0002](./0002-styling-tailwind-css.md)                                                               |
-| 9. 도메인 데이터 | 숫자·배열·날짜 의미 유지, 표시 포맷 별도, Book 스냅샷 저장                    | [0006](./0006-dto-domain-mapping-layer.md)                                                           |
+| 선택             | 확정 내용                                                                      | ADR                                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| 1. 구현 범위     | 기본 기능·디자인·핵심 테스트에 URL 동기화를 필수로 포함                        | [0009](./0009-ux-resilience-and-testing-strategy.md), [0010](./0010-url-search-state-and-history.md) |
+| 2. 계층 분리     | ExpandableCard와 도메인 바인딩, DTO·도메인·매퍼를 별도 계층으로 유지           | [0006](./0006-dto-domain-mapping-layer.md), [0007](./0007-component-and-hook-layering.md)            |
+| 3. API 실행·배포 | Vite 프록시와 Cloudflare Functions 유지, /api/books 통일, 실제 배포 검색 검증  | [0005](./0005-cors-proxy-cloudflare-pages.md)                                                        |
+| 4. 영속 상태     | Zustand + persist로 찜 스냅샷과 최근 검색어 관리                               | [0004](./0004-client-state-zustand.md)                                                               |
+| 5. 오류          | API 오류는 React Query 상태 UI, ErrorBoundary는 렌더링 오류 담당               | [0011](./0011-query-errors-and-render-boundary.md)                                                   |
+| 6. 테스트        | Vitest·RTL·MSW 핵심 테스트와 실제 배포 검증, Playwright는 필수에서 제외        | [0012](./0012-testing-and-deployment-validation.md)                                                  |
+| 7. 방문 기록     | 검색 제출·화면 전환은 push, 화면 전환 시 검색 조건 유지, 스크롤은 URL에서 제외 | [0010](./0010-url-search-state-and-history.md)                                                       |
+| 8. 상세검색 UI   | 버튼 아래 Popover와 검색 대상 선택, 제출 시 적용, Esc와 포커스 복귀            | [0002](./0002-styling-tailwind-css.md)                                                               |
+| 9. 도메인 데이터 | 숫자·배열·날짜 의미 유지, 표시 포맷 별도, Book 스냅샷 저장                     | [0006](./0006-dto-domain-mapping-layer.md)                                                           |
 
 기획의 Enter 검색·10개씩 무한 스크롤·최근 검색어 최대 8개·찜 시점 데이터 보관은 선택 사항이 아닌 구현 전제다.
 
@@ -24,7 +24,7 @@
 
 | 상태                                  | 기준 위치          |
 | ------------------------------------- | ------------------ |
-| 확정 검색 조건·활성 탭                | URL                |
+| 현재 화면(경로)·확정 검색 조건        | URL                |
 | 입력값·상세검색 임시값·팝업·카드 펼침 | 컴포넌트 로컬 상태 |
 | 검색 결과·요청·페이지                 | React Query        |
 | 찜 스냅샷·최근 검색어                 | Zustand + persist  |
@@ -50,7 +50,7 @@
 
 ## 구현과 검증 현황
 
-이번 변경은 ADR 문서 개정이다. 기존 프레임워크·타입 검사·빌드·린트·포맷·CI 설정은 존재하지만 기능 구현 완료를 의미하지 않는다.
+현재 RootProvider(QueryClient·BrowserRouter), 검색·찜 경로를 가진 기본 앱 셸, 화면 콘텐츠용 ErrorBoundary, `src/stores/favorites/`, `src/stores/searchHistory/`, `src/stores/util/`의 Zustand 저장소 코드가 구현되어 있다. 검색·찜 기능 UI와 API 연동은 아직 완료되지 않았다.
 
 다음 항목은 후속 구현·검증이 필요하다.
 

@@ -1,23 +1,19 @@
-import React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
+import { RootProvider } from './providers/RootProvider';
 import './index.css';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5분 캐시
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const rootElement = document.getElementById('root');
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
+if (!rootElement) {
+  throw new Error('앱 루트 요소를 찾을 수 없습니다.');
+}
+
+ReactDOM.createRoot(rootElement).render(
+  <StrictMode>
+    <RootProvider>
       <App />
-    </QueryClientProvider>
-  </React.StrictMode>
+    </RootProvider>
+  </StrictMode>
 );

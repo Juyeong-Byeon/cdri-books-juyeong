@@ -10,6 +10,7 @@
 
 ## 결정
 
+- React 컴포넌트를 정의하는 파일은 PascalCase로 작성한다. 설정·유틸리티·훅 파일은 기존 kebab-case 이름을 유지한다.
 - `src/components/ui/`는 `Book`, Zustand, API 모듈에 의존하지 않는다.
 - `ExpandableCard`는 펼침 상태·토글·콘텐츠·액션 슬롯을 받는 범용 레이아웃과 접근성 동작을 담당한다. ISBN·찜 저장·가격 계산을 알지 않는다.
 - `src/components/features/`의 `BookCardItem`은 `Book`을 받아 제목·표지·가격 표현과 찜 액션·구매 링크를 구성하고 범용 카드에 전달한다.

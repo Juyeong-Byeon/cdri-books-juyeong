@@ -10,6 +10,10 @@
 
 ## 결정
 
+- Zustand 저장소는 상태 도메인별로 분리해 찜 상태는 `src/stores/favorites/`, 검색 기록은 `src/stores/searchHistory/`에 둔다.
+- 저장소들이 공유하는 영속화 보조 코드는 `src/stores/util/`에 둔다. 현재 `safe-local-storage.ts`가 이 위치에 있다.
+- PascalCase 파일명 규칙은 React 컴포넌트 파일에만 적용한다. 저장소·hook·util 파일은 kebab-case를 유지한다.
+- 검색 기록의 상태와 액션은 일반적인 `term`보다 의미가 분명한 `searchKeyword` 이름을 사용한다.
 - Zustand와 `persist`를 유지하고 `localStorage`에 저장한다.
 - `favoriteStore`와 `searchHistoryStore`를 분리한다.
 - 찜에는 [ADR-0006](./0006-dto-domain-mapping-layer.md)의 `Book`을 찜한 시점의 스냅샷으로 저장한다. ID만 저장하거나 재조회 결과로 자동 갱신하지 않는다.
