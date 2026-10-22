@@ -7,6 +7,7 @@
 ---
 
 ## 📑 목차
+
 1. [프로젝트 개요](#1-프로젝트-개요)
 2. [기술 스택 및 아키텍처 설계 원칙](#2-기술-스택-및-아키텍처-설계-원칙)
 3. [피그마 디자인 시스템 토큰 스펙](#3-피그마-디자인-시스템-토큰-스펙)
@@ -37,16 +38,18 @@
 ## 2. 기술 스택 및 아키텍처 설계 원칙
 
 ### 2.1 기술 스택
-| 분류 | 기술 / 라이브러리 | 버전 | 선정 이유 |
-| :--- | :--- | :---: | :--- |
-| **Framework / Build** | **Vite + React + TypeScript** | React 19, TS 5 | - 번들 속도와 HMR이 가장 빠른 Vite 기반 구성<br/>- 과제 필수 요구사항(React, TypeScript, React Query) 본연의 컴포넌트 설계에 집중<br/>- Next.js의 불필요한 보일러플레이트 없이 가볍고 견고한 SPA 아키텍처 실현 |
-| **Server State** | **TanStack Query (React Query)** | v5 | - `useInfiniteQuery`를 활용한 표준 무한 스크롤 및 페이지네이션 제어<br/>- `staleTime`, `gcTime` 최적화로 동일 검색어 중복 호출 방지 및 즉각적 캐시 렌더링<br/>- 로딩, 에러, 페칭 상태의 선언적 관리 |
-| **Client State** | **Zustand** | v5 | - **셀렉터(Selector) 기반 구독 최적화**: 찜 상태 변경 시 해당 도서 카드만 리렌더링되고 다른 카드는 리렌더링 0회 달성<br/>- **persist 미들웨어**: 단 2줄로 `localStorage` 자동 동기화 및 새로고침 영속성 보장<br/>- 약 1.1KB 초경량 번들 및 Provider-less 아키텍처 |
-| **Styling & UI Core** | **Tailwind CSS + shadcn/ui (Radix UI)** | Tailwind v3/v4 | - **피그마 디자인 스펙 100% 토큰화**: 컬러 팔레트 및 타이포그래피 계층을 Tailwind config에 완벽 주입<br/>- **접근성(WAI-ARIA) 코어 활용**: shadcn/ui(Radix UI)를 가져와 피그마 디자인 스펙에 맞추어 CVA variant를 커스텀 수정하여 사용 |
-| **Icons** | **Lucide React** | 최신 | - 피그마 시안에 명시된 돋보기, 하트(찜), 아코디언 화살표, 닫기 등 일관성 있는 모던 벡터 아이콘 제공 |
-| **Infrastructure** | **Cloudflare Pages + Functions** | - | - 클라이언트 번들에 카카오 `REST API Key`를 일절 노출하지 않는 **엣지 서버리스 프록시** 구축<br/>- CORS 원천 차단 및 글로벌 엣지 캐싱 |
+
+| 분류                  | 기술 / 라이브러리                       |      버전      | 선정 이유                                                                                                                                                                                                                                                         |
+| :-------------------- | :-------------------------------------- | :------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework / Build** | **Vite + React + TypeScript**           | React 19, TS 5 | - 번들 속도와 HMR이 가장 빠른 Vite 기반 구성<br/>- 과제 필수 요구사항(React, TypeScript, React Query) 본연의 컴포넌트 설계에 집중<br/>- Next.js의 불필요한 보일러플레이트 없이 가볍고 견고한 SPA 아키텍처 실현                                                    |
+| **Server State**      | **TanStack Query (React Query)**        |       v5       | - `useInfiniteQuery`를 활용한 표준 무한 스크롤 및 페이지네이션 제어<br/>- `staleTime`, `gcTime` 최적화로 동일 검색어 중복 호출 방지 및 즉각적 캐시 렌더링<br/>- 로딩, 에러, 페칭 상태의 선언적 관리                                                               |
+| **Client State**      | **Zustand**                             |       v5       | - **셀렉터(Selector) 기반 구독 최적화**: 찜 상태 변경 시 해당 도서 카드만 리렌더링되고 다른 카드는 리렌더링 0회 달성<br/>- **persist 미들웨어**: 단 2줄로 `localStorage` 자동 동기화 및 새로고침 영속성 보장<br/>- 약 1.1KB 초경량 번들 및 Provider-less 아키텍처 |
+| **Styling & UI Core** | **Tailwind CSS + shadcn/ui (Radix UI)** | Tailwind v3/v4 | - **피그마 디자인 스펙 100% 토큰화**: 컬러 팔레트 및 타이포그래피 계층을 Tailwind config에 완벽 주입<br/>- **접근성(WAI-ARIA) 코어 활용**: shadcn/ui(Radix UI)를 가져와 피그마 디자인 스펙에 맞추어 CVA variant를 커스텀 수정하여 사용                            |
+| **Icons**             | **Lucide React**                        |      최신      | - 피그마 시안에 명시된 돋보기, 하트(찜), 아코디언 화살표, 닫기 등 일관성 있는 모던 벡터 아이콘 제공                                                                                                                                                               |
+| **Infrastructure**    | **Cloudflare Pages + Functions**        |       -        | - 클라이언트 번들에 카카오 `REST API Key`를 일절 노출하지 않는 **엣지 서버리스 프록시** 구축<br/>- CORS 원천 차단 및 글로벌 엣지 캐싱                                                                                                                             |
 
 ### 2.2 핵심 아키텍처 설계 원칙
+
 1. **서버 DTO와 프론트엔드 도메인 모델 분리 (Anti-Corruption Layer)**:
    - 외부 API 응답 타입(`KakaoBookDocumentDTO`)을 컴포넌트로 직접 흘려보내지 않고, 매퍼(`bookMapper.ts`)를 거쳐 프론트엔드 전용 모델(`Book`)로 정제 및 변환합니다.
 2. **도메인 중립 뷰(UI)와 도메인 종속 피처(Feature) 분리**:
@@ -64,6 +67,7 @@
 피그마 디자인 시안과 100% 일치하도록 정의된 디자인 토큰 스펙입니다:
 
 ### 3.1 컬러 팔레트
+
 ```typescript
 colors: {
   palette: {
@@ -83,38 +87,45 @@ colors: {
 ```
 
 ### 3.2 타이포그래피 (Noto Sans KR)
-| 토큰명 | Font Size | Line Height | Font Weight | 용도 |
-| :--- | :---: | :---: | :---: | :--- |
-| **`title1`** | 24px | 24px | 700 (Bold) | 대제목, 메인 헤더 타이틀 |
-| **`title2`** | 22px | 24px | 700 (Bold) | 섹션 타이틀, 검색 결과 타이틀 |
-| **`title3`** | 18px | 18px | 700 (Bold) | 도서 제목, 모달 타이틀 |
-| **`body1`** | 20px | 20px | 500 (Medium) | 본문 강조 텍스트, 탭 라벨 |
-| **`body2`** | 14px | 14px | 500 (Medium) | 기본 본문, 도서 저자/출판사 정보 |
-| **`body2-bold`**| 14px | 14px | 700 (Bold) | 볼드 본문, 가격 강조 |
-| **`caption`** | 16px | 16px | 500 (Medium) | 캡션 텍스트, 인풋 텍스트 |
-| **`small`** | 10px | 10px | 500 (Medium) | 배지, 날짜 보조 정보 |
+
+| 토큰명           | Font Size | Line Height | Font Weight  | 용도                             |
+| :--------------- | :-------: | :---------: | :----------: | :------------------------------- |
+| **`title1`**     |   24px    |    24px     |  700 (Bold)  | 대제목, 메인 헤더 타이틀         |
+| **`title2`**     |   22px    |    24px     |  700 (Bold)  | 섹션 타이틀, 검색 결과 타이틀    |
+| **`title3`**     |   18px    |    18px     |  700 (Bold)  | 도서 제목, 모달 타이틀           |
+| **`body1`**      |   20px    |    20px     | 500 (Medium) | 본문 강조 텍스트, 탭 라벨        |
+| **`body2`**      |   14px    |    14px     | 500 (Medium) | 기본 본문, 도서 저자/출판사 정보 |
+| **`body2-bold`** |   14px    |    14px     |  700 (Bold)  | 볼드 본문, 가격 강조             |
+| **`caption`**    |   16px    |    16px     | 500 (Medium) | 캡션 텍스트, 인풋 텍스트         |
+| **`small`**      |   10px    |    10px     | 500 (Medium) | 배지, 날짜 보조 정보             |
 
 ---
 
 ## 4. 실행 방법 및 환경 설정
 
 ### 4.1 사전 요구사항
+
 - Node.js `v22.x` (Active LTS 권장, `.nvmrc` 기준 `v22.23.2`)
 - npm `10.x` 이상 또는 pnpm
 
 ### 4.2 환경 변수 설정 (`.env`)
+
 프로젝트 루트 경로에 `.env` 파일을 생성하고 발급받은 카카오 REST API 키를 입력합니다.
+
 > ⚠️ `.env` 파일은 `.gitignore`에 등록되어 GitHub 저장소에 커밋되지 않습니다.
 
 ```bash
 # .env
-VITE_KAKAO_REST_API_KEY=your_kakao_rest_api_key_here
+KAKAO_REST_API_KEY=your_kakao_rest_api_key_here
 ```
 
+이 키는 Vite 개발 프록시와 Cloudflare Pages Function에서만 사용합니다. 프런트엔드 코드나 `import.meta.env`에서 읽지 마세요. 배포 시 Cloudflare Pages 프로젝트의 secret 변수에도 같은 이름(`KAKAO_REST_API_KEY`)으로 등록합니다. 로컬 프록시 경로는 `/api/search/book`, 배포 Function 경로는 `/api/books`이며, API 클라이언트가 환경에 따라 경로를 선택하도록 합니다.
+
 ### 4.3 설치 및 실행
+
 ```bash
 # 1. 의존성 패키지 설치
-npm install
+npm ci
 
 # 2. 로컬 개발 서버 실행 (Vite Proxy 동작)
 npm run dev
@@ -180,6 +191,7 @@ cdri-books-juyeong/
 ```
 
 ### 주요 코드 역할
+
 - **`favoriteStore.ts`**: `Map` 또는 Key-Value 형태(`Record<string, Book>`)로 찜한 도서를 관리하여 $O(1)$ 탐색을 보장하며, `useFavoriteStore(state => !!state.favoriteMap[book.id])` 셀렉터를 통해 불필요한 리렌더링을 완벽하게 차단합니다.
 - **`bookMapper.ts`**: 카카오 API의 스네이크 케이스, `-1` 정가 처리, 복합 ISBN 파싱 등을 수행하여 완벽하게 정제된 `Book` 인터페이스를 생성합니다.
 - **`useBookSearch.ts`**: TanStack Query의 복잡한 반환값 중 UI에서 꼭 필요한 `books`, `totalCount`, `loadMore`, `isLoading`, `isFetchingNextPage`, `isEmpty`만 엄선하여 반환합니다.
@@ -191,6 +203,7 @@ cdri-books-juyeong/
 피그마 기획 및 요구사항 명세에 정의된 세부 비즈니스 로직을 엄격하게 구현합니다.
 
 ### 1) 도서 검색 및 정렬 (기본 검색 vs 상세 검색 상호 배타)
+
 - **Placeholder**: `'검색어 입력'`
 - **검색 실행**: 검색어 입력 후 **`Enter` 키**를 누르면 검색이 트리거되고, 페이지 당 **10개의 결과**(`size=10`)가 노출됩니다.
 - **상세 검색 (하단 레이어 팝업)**:
@@ -203,6 +216,7 @@ cdri-books-juyeong/
   - 전체 검색 진행 시: 이전 상세 검색 조건 및 입력 필드는 **자동 초기화**됩니다.
 
 ### 2) 검색 기록 관리 (`searchHistoryStore`)
+
 - **최대 저장 개수**: **최대 8개** 저장
 - **FIFO 큐 정책**: 8개를 초과하여 새 검색어가 유입될 경우, **가장 오래된 검색어부터 자동으로 삭제**됩니다.
 - **중복 처리**: 이미 존재하는 검색어를 재입력할 경우, 중복 저장되지 않고 최상단(최신 순)으로 위치가 갱신됩니다.
@@ -210,10 +224,12 @@ cdri-books-juyeong/
 - **개별/전체 삭제**: 검색어 항목별 `X` 버튼으로 개별 삭제하거나 전체 삭제가 가능합니다.
 
 ### 3) 도서 상세 아코디언 & 구매 링크
+
 - **상세보기 ∨**: 클릭 시 아코디언 형태로 도서 요약 내용과 정가/할인가, 큰 표지가 확장됩니다.
 - **구매하기 버튼**: 클릭 시 새 탭(`target="_blank" rel="noopener noreferrer"`)이 열리며 해당 책의 **카카오(다음 책) 상세 페이지**로 이동합니다.
 
 ### 4) 찜하기 (스냅샷 기반 영속 보관)
+
 - **스냅샷 보관 정책**: 찜하기 버튼을 누른 **그 시점의 도서 데이터(제목, 가격, 표지 등)를 스냅샷 형태로 보관**합니다. 따라서 이후 카카오 API의 실시간 응답 데이터가 변동되더라도 찜한 시점의 데이터가 보존됩니다.
 - **영속성 보장**: 브라우저를 닫거나 재시작한 후에도 찜한 도서 목록이 100% 유지됩니다.
 - **동기화**: [도서 검색] 화면과 [내가 찜한 책] 화면 간의 찜 상태가 실시간으로 완벽하게 동기화됩니다.
@@ -223,25 +239,32 @@ cdri-books-juyeong/
 ## 7. 강조하고 싶은 기능 및 차별화 포인트
 
 ### 🎨 1. 피그마 디자인 시스템 토큰화 및 shadcn 커스텀
+
 - 피그마의 컬러 스펙(`Palette`, `Text`)과 타이포그래피(`Title1~3`, `Body1~2`, `caption`, `small`)를 Tailwind 토큰으로 구축하고, Radix UI 접근성 코어 위에 피그마 전용 UI를 완벽하게 재현했습니다.
 
 ### ⚡ 2. 대량 리스트 렌더링 최적화 (Zustand Selector)
+
 - 찜하기 버튼을 누를 때 전체 목록(30~50개)이 리렌더링되는 Context API의 한계를 극복하고, **클릭한 해당 카드 단 1개만 리렌더링되도록 원자 단위 셀렉터 구독을 구현**했습니다.
 
 ### 🛡️ 3. API Key 완벽 보안 & CORS 해결 (Cloudflare Pages Functions)
+
 - 브라우저에 카카오 `REST API Key`를 절대 노출하지 않도록 로컬 개발 환경(`vite.config.ts`)과 배포 환경(`functions/api/books.ts`) 모두에 프록시 레이어를 구축했습니다.
 
 ### 🏛️ 4. DTO와 도메인 모델 분리 (부패 방지 계층)
+
 - 외부 API 응답과 내부 도메인 모델을 명확히 분리하여, API 스펙 변동에 취약하지 않고 유지보수성이 극대화된 아키텍처를 구현했습니다.
 
 ### 🚀 5. 네트워크 비용 절감 및 캐싱 최적화
+
 - **Debouncing**: 실시간 입력 시 불필요한 API 폭주를 막기 위해 디바운싱을 적용했습니다.
 - **Query Cache**: 이미 조회한 키워드의 결과는 React Query 캐시에 저장되어, [도서 검색]과 [내가 찜한 책] 탭을 오갈 때 네트워크 재요청 없이 즉각 렌더링됩니다.
 
 ### 🌐 6. URL Search Params 양방향 동기화 (Deep Linking)
+
 - 검색어, 정렬, 탭 상태를 URL 쿼리 파라미터와 동기화하여 **새로고침 시에도 검색 상태를 100% 복원**하고, 브라우저 뒤로가기/앞으로가기 및 링크 공유를 완벽 지원합니다.
 
 ### 🛡️ 7. 회복 탄력적 에러 핸들링 & 이미지 CLS 방어
+
 - 도서 목록 영역에 격리된 `ErrorBoundary`와 `[다시 시도]` 버튼을 제공하여 API 장애 시에도 전체 앱이 멈추지 않습니다.
 - 고정 종횡비(`aspect-[3/4]`)와 Fallback SVG를 통해 레이아웃 누적 이동(CLS) 0% 및 깨진 이미지 완벽 방어를 달성했습니다.
 
@@ -252,6 +275,7 @@ cdri-books-juyeong/
 프로덕션 수준의 안정성과 일관된 코드 품질 유지를 위해 자동화 검증 파이프라인을 구축합니다.
 
 ### 8.1 Git Commit Hooks (Husky + lint-staged + Commitlint)
+
 - **`commit-msg`**:
   - `Conventional Commits` 규약(`feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, `perf:` 등) 준수 여부 검증
   - 비표준 커밋 메시지 작성 시 커밋 차단
@@ -262,6 +286,7 @@ cdri-books-juyeong/
   - 원격 저장소 전송 전 단위 및 컴포넌트 테스트 전수 검증 (`npm run test:run` ➔ `vitest run`)
 
 ### 8.2 GitHub Actions CI 파이프라인 (`.github/workflows/ci.yml`)
+
 - **실행 환경**: Node.js `v22.x` (LTS)
 - **트리거**: `main` 브랜치 푸시 및 모든 PR(Pull Request)
 - **검증 단계**: `npm ci` ➔ `typecheck` ➔ `format:check` ➔ `lint` ➔ `test:run` ➔ `build`

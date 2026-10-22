@@ -23,9 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment Variables (Kakao API Key Security)
+# Environment variables (keep Kakao API keys out of Git)
 .env
-.env.production
-.env.local
-.env.*.local
+.env.*
 !.env.example

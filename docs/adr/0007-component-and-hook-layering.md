@@ -7,6 +7,7 @@
 ---
 
 ## 1. 배경 및 맥락 (Context)
+
 컴포넌트가 도메인 모델(`Book` 등)에 직접 의존하면, 디자인 시스템 레벨의 컴포넌트 재사용성이 크게 떨어지고 다른 도메인이나 화면에서 재활용하기 어려워집니다. 또한 커스텀 훅이 TanStack Query의 방대한 내부 객체(`data`, `fetchNextPage`, `refetch`, `isFetching` 등)를 그대로 UI 컴포넌트로 전달하면 컴포넌트가 훅의 내부 구현 세부사항에 과도하게 결합(Tight Coupling)되는 문제가 발생합니다.
 
 ---
@@ -14,6 +15,7 @@
 ## 2. 결정 내용 (Decision)
 
 ### 1) UI 컴포넌트 계층 분리 (Presentational vs Container)
+
 컴포넌트를 **도메인 중립적 UI(Presentational)**와 **도메인 종속적 UI(Container/Feature)**의 2개 계층으로 철저히 분리합니다.
 
 ```mermaid
@@ -44,6 +46,7 @@ flowchart TD
 ---
 
 ### 2) 커스텀 훅의 응답 캡슐화 (Minimal & Expressive Hook Returns)
+
 커스텀 훅은 서드파티 라이브러리의 원시 상태를 그대로 누출하지 않고, **UI 컴포넌트가 렌더링에 꼭 필요한 인터페이스만 정제하여 반환**합니다.
 
 ```typescript
@@ -66,6 +69,7 @@ export interface UseBookSearchResult {
 ---
 
 ## 3. 결정의 결과 및 영향 (Consequences)
+
 - **높은 재사용성**: `ui/` 디렉터리의 컴포넌트들은 디자인 시스템 카탈로그(Storybook 등)에 등록 가능한 순수 UI 자산으로 격리됩니다.
 - **테스트 용이성**: 뷰 컴포넌트는 단순 props 전달만으로 시각적 회귀 및 스냅샷 테스트가 가능하며, 비즈니스 로직과 분리되어 테스트 복잡도가 극적으로 낮아집니다.
 - **클린 컴포넌트**: 컴포넌트 파일이 짧고 직관적이며, 훅과 컴포넌트 간의 책임(SRP)이 명확해집니다.
