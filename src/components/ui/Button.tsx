@@ -16,6 +16,7 @@ const buttonVariants = cva(
           'rounded-md bg-palette-lightGray text-caption text-text-secondary hover:bg-palette-gray/60',
         ghost: 'bg-transparent text-palette-white',
         'muted-ghost': 'bg-transparent text-ui-gray hover:text-text-secondary',
+        'subtle-ghost': 'bg-transparent text-caption text-text-subtitle hover:text-text-primary',
       },
       size: {
         default: 'h-12 px-5',

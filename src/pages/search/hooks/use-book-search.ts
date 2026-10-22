@@ -1,16 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { searchBooks } from '@/services/books';
-import {
-  BOOK_PAGE_SIZE,
-  MAX_BOOK_PAGE,
-  type BookSearchConditions,
-} from '@/types/domain/book-search';
+import { MAX_BOOK_PAGE, type BookSearchConditions } from '@/types/domain/book-search';
+import { getBookSearchQueryKey } from '../utils/book-search-query-key';
 
 export function useBookSearch(conditions: BookSearchConditions) {
   const isIdle = !conditions.searchKeyword;
   const query = useInfiniteQuery({
-    queryKey: ['books', { ...conditions, size: BOOK_PAGE_SIZE }],
+    queryKey: getBookSearchQueryKey(conditions),
     queryFn: ({ pageParam, signal }) => searchBooks(conditions, pageParam, signal),
     initialPageParam: 1,
     enabled: !isIdle,

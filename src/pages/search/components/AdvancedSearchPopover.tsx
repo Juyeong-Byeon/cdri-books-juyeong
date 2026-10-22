@@ -12,18 +12,13 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { cx } from '@/lib/utils';
-import {
-  BOOK_SEARCH_TARGETS,
-  type BookSearchConditions,
-  type BookSearchTarget,
-} from '@/types/domain/book-search';
+import { BOOK_SEARCH_TARGETS, type BookSearchTarget } from '@/types/domain/book-search';
+import { useSearchConditions } from '../hooks/use-search-conditions';
+import { useSearchSubmit } from '../hooks/use-search-submit';
 
-interface AdvancedSearchPopoverProps {
-  conditions: BookSearchConditions;
-  onSearch: (searchKeyword: string, target: BookSearchTarget) => void;
-}
-
-export function AdvancedSearchPopover({ conditions, onSearch }: AdvancedSearchPopoverProps) {
+export function AdvancedSearchPopover() {
+  const conditions = useSearchConditions();
+  const submitSearch = useSearchSubmit(conditions);
   const [open, setOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [target, setTarget] = useState<BookSearchTarget>('title');
@@ -43,7 +38,7 @@ export function AdvancedSearchPopover({ conditions, onSearch }: AdvancedSearchPo
     event.preventDefault();
     const keyword = searchKeyword.trim();
     if (!keyword) return;
-    onSearch(keyword, target);
+    submitSearch(keyword, target);
     setOpen(false);
   }
 

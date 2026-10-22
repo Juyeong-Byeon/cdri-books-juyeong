@@ -1,20 +1,28 @@
-import { BookList } from '@/components/features/book/BookList';
+import { BookCardItem } from '@/components/features/book/BookCardItem';
+import { BookList, BookListItem } from '@/components/features/book/BookList';
+import { BookListSkeleton } from '@/components/features/book/BookListSkeleton';
 import { cx } from '@/lib/utils';
-import type { useBookSearch } from '../hooks/use-book-search';
+import { BOOK_PAGE_SIZE } from '@/types/domain/book-search';
+import { useBookSearch } from '../hooks/use-book-search';
 import { useLoadMore } from '../hooks/use-load-more';
+import { useSearchConditions } from '../hooks/use-search-conditions';
 import { SearchEmptyState } from './SearchEmptyState';
 import { SearchErrorState } from './SearchErrorState';
 import { SearchLoadMore } from './SearchLoadMore';
+import { SearchResultCount } from './SearchResultCount';
 
-interface SearchResultsProps {
-  search: ReturnType<typeof useBookSearch>;
-}
-
-export function SearchResults({ search }: SearchResultsProps) {
+export function SearchResults() {
+  const conditions = useSearchConditions();
+  const search = useBookSearch(conditions);
   const sentinelRef = useLoadMore(search.canLoadMore, search.loadMore);
 
   return (
     <>
+      {(!search.isError || search.books.length > 0) && (
+        <div className={cx('w-full max-w-[570px]')}>
+          <SearchResultCount totalCount={search.totalCount} isLoading={search.isLoading} />
+        </div>
+      )}
       {search.isError && !search.isFetchNextPageError && (
         <SearchErrorState
           error={search.error}
@@ -28,11 +36,17 @@ export function SearchResults({ search }: SearchResultsProps) {
       {search.isIdle || search.isEmpty ? (
         <SearchEmptyState />
       ) : (
-        <BookList
-          books={search.books}
-          isLoading={search.isLoading}
-          isLoadingMore={search.isFetchingNextPage}
-        />
+        <BookList aria-busy={search.isLoading || search.isFetchingNextPage}>
+          {search.isLoading ? (
+            <BookListSkeleton count={BOOK_PAGE_SIZE} />
+          ) : (
+            search.books.map((book) => (
+              <BookListItem key={book.id}>
+                <BookCardItem book={book} />
+              </BookListItem>
+            ))
+          )}
+        </BookList>
       )}
       {search.isFetchNextPageError && (
         <SearchErrorState
