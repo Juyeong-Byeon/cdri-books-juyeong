@@ -13,34 +13,48 @@ import { SearchResultCount } from './SearchResultCount';
 
 export function SearchResults() {
   const conditions = useSearchConditions();
-  const search = useBookSearch(conditions);
-  const sentinelRef = useLoadMore(search.canLoadMore, search.loadMore);
+  const {
+    books,
+    totalCount,
+    isIdle,
+    isLoading,
+    isEmpty,
+    error,
+    isError,
+    isFetching,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    hasNextPage,
+    canLoadMore,
+    loadMore,
+    retry,
+    retryNextPage,
+  } = useBookSearch(conditions);
+  const sentinelRef = useLoadMore(canLoadMore, loadMore);
 
   return (
     <>
-      {(!search.isError || search.books.length > 0) && (
+      {(!isError || books.length > 0) && (
         <div className={cx('w-full max-w-[570px]')}>
-          <SearchResultCount totalCount={search.totalCount} isLoading={search.isLoading} />
+          <SearchResultCount totalCount={totalCount} isLoading={isLoading} />
         </div>
       )}
-      {search.isError && !search.isFetchNextPageError && (
+      {isError && !isFetchNextPageError && (
         <SearchErrorState
-          error={search.error}
-          title={
-            search.books.length ? '검색 결과를 갱신하지 못했습니다.' : '도서 검색에 실패했습니다.'
-          }
-          onRetry={search.retry}
-          isRetrying={search.isFetching}
+          error={error}
+          title={books.length ? '검색 결과를 갱신하지 못했습니다.' : '도서 검색에 실패했습니다.'}
+          onRetry={retry}
+          isRetrying={isFetching}
         />
       )}
-      {search.isIdle || search.isEmpty ? (
+      {isIdle || isEmpty ? (
         <BookEmptyState description="검색된 결과가 없습니다." />
       ) : (
-        <BookList aria-busy={search.isLoading || search.isFetchingNextPage}>
-          {search.isLoading ? (
+        <BookList aria-busy={isLoading || isFetchingNextPage}>
+          {isLoading ? (
             <BookListSkeleton count={BOOK_PAGE_SIZE} />
           ) : (
-            search.books.map((book) => (
+            books.map((book) => (
               <BookListItem key={book.id}>
                 <BookCardItem book={book} />
               </BookListItem>
@@ -48,22 +62,22 @@ export function SearchResults() {
           )}
         </BookList>
       )}
-      {search.isFetchNextPageError && (
+      {isFetchNextPageError && (
         <SearchErrorState
-          error={search.error}
+          error={error}
           title="다음 도서를 불러오지 못했습니다."
-          onRetry={search.retryNextPage}
-          isRetrying={search.isFetching}
+          onRetry={retryNextPage}
+          isRetrying={isFetching}
         />
       )}
       <div ref={sentinelRef} aria-hidden="true" className={cx('h-px [overflow-anchor:none]')} />
-      {!search.isIdle && search.books.length > 0 && (
+      {!isIdle && books.length > 0 && (
         <SearchLoadMore
-          hasNextPage={search.hasNextPage}
-          isError={search.isError}
-          isFetching={search.isFetching}
-          isFetchingNextPage={search.isFetchingNextPage}
-          onLoadMore={search.loadMore}
+          hasNextPage={hasNextPage}
+          isError={isError}
+          isFetching={isFetching}
+          isFetchingNextPage={isFetchingNextPage}
+          onLoadMore={loadMore}
         />
       )}
     </>
