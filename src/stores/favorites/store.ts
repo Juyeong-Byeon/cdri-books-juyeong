@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Book } from '@/types/domain/book';
-import { safeLocalStorage } from '../util/safe-local-storage';
+import { safeLocalStorage } from '../util/safeLocalStorage';
 
 interface FavoritesStore {
   books: Book[];

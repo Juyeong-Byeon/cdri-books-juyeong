@@ -3,7 +3,7 @@ import { HeartIcon } from '@/components/ui/HeartIcon';
 import { cx } from '@/lib/utils';
 import { useFavoritesStore } from '@/stores/favorites/store';
 import type { Book } from '@/types/domain/book';
-import { formatBookTitle } from './utils/format-book';
+import { formatBookTitle } from './utils/formatBook';
 
 interface BookFavoriteButtonProps {
   book: Book;

@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { searchBooks } from '@/services/books';
 import { MAX_BOOK_PAGE, type BookSearchConditions } from '@/types/domain/book-search';
-import { getBookSearchQueryKey } from '../utils/book-search-query-key';
+import { getBookSearchQueryKey } from '../utils/bookSearchQueryKey';
 
 export function useBookSearch(conditions: BookSearchConditions) {
   const isIdle = !conditions.searchKeyword;

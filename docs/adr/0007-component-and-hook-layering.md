@@ -1,7 +1,7 @@
 # ADR-0007: 범용 UI·도메인 바인딩 분리와 검색 훅 인터페이스
 
 - **상태**: 승인 (Accepted)
-- **결정·개정 일자**: 2026-10-22
+- **결정·개정 일자**: 2026-10-23
 - **결정자**: 변주영
 
 ## 배경
@@ -10,7 +10,7 @@
 
 ## 결정
 
-- React 컴포넌트를 정의하는 파일은 PascalCase로 작성한다. 설정·유틸리티·훅 파일은 기존 kebab-case 이름을 유지한다.
+- React 컴포넌트 파일은 PascalCase(`BookCardItem.tsx`)로 작성한다. 커스텀 훅 파일은 내보내는 훅 이름과 같은 camelCase(`useBookSearch.ts`)로 작성하고, 유틸리티·매퍼·저장소 어댑터 등 함수 중심 파일도 camelCase(`formatBook.ts`, `bookMapper.ts`, `safeLocalStorage.ts`)로 작성한다. 설정·타입·저장소 파일은 기존 이름을 유지한다.
 - 페이지 진입 컴포넌트는 `src/pages/<페이지 경로>/Page.tsx`에 둔다. 페이지에서만 사용하는 컴포넌트·훅·유틸리티·타입·에셋은 해당 페이지 아래에서 관리하며, 필요한 파일이 생길 때 `components/`, `hooks/`, `utils/`, `types/`, `assets/`를 추가한다.
 - 여러 페이지가 공유하는 UI·레이아웃·도메인 코드만 공통 계층에 둔다. `Page.tsx`는 공통 레이아웃과 페이지 전용 컴포넌트를 조합한다.
 - `src/components/ui/`는 `Book`, Zustand, API 모듈에 의존하지 않는다.

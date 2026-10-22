@@ -1,5 +1,5 @@
 import { cx } from '@/lib/utils';
-import { formatAuthors } from './utils/format-book';
+import { formatAuthors } from './utils/formatBook';
 
 interface BookHeadingProps {
   title: string;

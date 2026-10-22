@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
-import { serializeSearchConditions } from '../utils/search-params';
-import { useSearchConditions } from './use-search-conditions';
+import { serializeSearchConditions } from '../utils/searchParams';
+import { useSearchConditions } from './useSearchConditions';
 
 export function useNormalizeSearchParams() {
   const [searchParams, setSearchParams] = useSearchParams();

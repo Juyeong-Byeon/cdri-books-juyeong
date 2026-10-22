@@ -181,18 +181,18 @@ cdri-books-juyeong/
 │   │       │   ├── AdvancedSearchPopover.tsx
 │   │       │   ├── SearchResultCount.tsx
 │   │       │   └── SearchErrorState.tsx
-│   │       ├── hooks/              # use-book-search, use-load-more
-│   │       └── utils/search-params.ts # URL 검색 조건 파싱·직렬화
+│   │       ├── hooks/              # useBookSearch, useLoadMore
+│   │       └── utils/searchParams.ts # URL 검색 조건 파싱·직렬화
 │   ├── stores/
 │   │   ├── favorites/
 │   │   │   └── store.ts              # 찜한 Book 스냅샷 Zustand 저장소
 │   │   ├── searchHistory/
 │   │   │   └── store.ts              # 최근 검색어 Zustand 저장소
 │   │   └── util/
-│   │       └── safe-local-storage.ts # 저장소 접근 실패를 격리하는 persist 어댑터
+│   │       └── safeLocalStorage.ts # 저장소 접근 실패를 격리하는 persist 어댑터
 │   ├── services/
 │   │   ├── books.ts                # /api/books 요청과 HTTP 오류 처리
-│   │   └── mappers/book-mapper.ts   # Kakao DTO → Book·페이지 메타데이터
+│   │   └── mappers/bookMapper.ts   # Kakao DTO → Book·페이지 메타데이터
 │   ├── types/
 │   │   ├── domain/                 # Book·검색 조건·페이지 모델
 │   │   └── dto/kakao-book.ts        # 카카오 응답 타입
@@ -213,8 +213,8 @@ cdri-books-juyeong/
 - **`BookList.tsx` / `BookCardItem.tsx`**: 검색 결과와 찜 스냅샷 목록, 독립적인 상세 펼침, 찜 저장소 연결, 새 탭 구매 링크를 제공합니다. 최초 요청은 카드 Skeleton, 추가 요청은 기존 목록과 높이가 일정한 하단 로딩 표시를 사용합니다. 새 행·표지에 짧은 등장 효과를 적용하며 동작 줄이기 설정을 따릅니다.
 - **`ExpandableCard.tsx`**: 도서 모델에 의존하지 않고 미디어·제목·상세·액션 슬롯을 배치합니다. Radix Collapsible로 상세 토글의 키보드 조작과 ARIA 연결을 구성합니다.
 - **`BookCover.tsx`**: 기본 48×68px·확대 210×280px 공간을 확보하며 이미지 로딩 Skeleton과 빈 표지·로드 실패 대체 표시를 처리합니다.
-- **`use-book-search.ts`**: URL에서 읽은 확정 조건을 쿼리 키로 사용합니다. React Query가 페이지·취소·캐시를 관리하고, 훅에서 중복 도서를 제거해 뷰에 전달합니다. 추가 페이지 오류가 발생하면 기존 결과를 유지하고 명시적인 재시도를 기다립니다.
-- **`book-mapper.ts`**: 유효한 ISBN-13·ISBN-10 또는 URL로 ID를 만들고, 미제공 가격을 `null`로 변환해 0원과 구분합니다. 가격·저자 표시 형식은 카드의 표시 유틸리티에서 처리합니다.
+- **`useBookSearch.ts`**: URL에서 읽은 확정 조건을 쿼리 키로 사용합니다. React Query가 페이지·취소·캐시를 관리하고, 훅에서 중복 도서를 제거해 뷰에 전달합니다. 추가 페이지 오류가 발생하면 기존 결과를 유지하고 명시적인 재시도를 기다립니다.
+- **`bookMapper.ts`**: 유효한 ISBN-13·ISBN-10 또는 URL로 ID를 만들고, 미제공 가격을 `null`로 변환해 0원과 구분합니다. 가격·저자 표시 형식은 카드의 표시 유틸리티에서 처리합니다.
 - **Zustand 저장소**: 찜 도서는 저장 시점의 스냅샷으로 보관하고, 최근 검색어는 중복을 맨 앞으로 이동해 최대 8개까지 저장합니다. 손상된 저장 데이터와 localStorage 접근 실패가 앱 중단 원인이 되지 않도록 처리합니다.
 
 ---

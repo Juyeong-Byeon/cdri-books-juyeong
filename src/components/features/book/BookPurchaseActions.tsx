@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { cx } from '@/lib/utils';
 import type { Book } from '@/types/domain/book';
-import { formatBookTitle, formatPrice, getPurchaseUrl } from './utils/format-book';
+import { formatBookTitle, formatPrice, getPurchaseUrl } from './utils/formatBook';
 
 interface BookPurchaseActionsProps {
   book: Book;

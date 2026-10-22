@@ -1,7 +1,7 @@
 # ADR-0004: Zustand persist로 찜 스냅샷과 최근 검색어 저장
 
 - **상태**: 승인 (Accepted)
-- **결정·개정 일자**: 2026-10-22
+- **결정·개정 일자**: 2026-10-23
 - **결정자**: 변주영
 
 ## 배경
@@ -11,8 +11,8 @@
 ## 결정
 
 - Zustand 저장소는 상태 도메인별로 분리해 찜 상태는 `src/stores/favorites/`, 검색 기록은 `src/stores/searchHistory/`에 둔다.
-- 저장소들이 공유하는 영속화 보조 코드는 `src/stores/util/`에 둔다. 현재 `safe-local-storage.ts`가 이 위치에 있다.
-- PascalCase 파일명 규칙은 React 컴포넌트 파일에만 적용한다. 저장소·hook·util 파일은 kebab-case를 유지한다.
+- 저장소들이 공유하는 영속화 보조 코드는 `src/stores/util/`에 둔다. 현재 `safeLocalStorage.ts`가 이 위치에 있다.
+- 파일명 규칙은 [ADR-0007](./0007-component-and-hook-layering.md)을 따른다.
 - 검색 기록의 상태와 액션은 일반적인 `term`보다 의미가 분명한 `searchKeyword` 이름을 사용한다.
 - Zustand와 `persist`를 유지하고 `localStorage`에 저장한다.
 - `favoriteStore`와 `searchHistoryStore`를 분리한다.

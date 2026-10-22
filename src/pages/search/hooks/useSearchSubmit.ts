@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSearchHistoryStore } from '@/stores/searchHistory/store';
 import type { BookSearchConditions, BookSearchTarget } from '@/types/domain/book-search';
-import { serializeSearchConditions } from '../utils/search-params';
-import { getBookSearchQueryKey } from '../utils/book-search-query-key';
+import { serializeSearchConditions } from '../utils/searchParams';
+import { getBookSearchQueryKey } from '../utils/bookSearchQueryKey';
 
 export function useSearchSubmit(conditions: BookSearchConditions) {
   const queryClient = useQueryClient();

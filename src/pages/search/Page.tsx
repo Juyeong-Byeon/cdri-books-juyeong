@@ -2,7 +2,7 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { cx } from '@/lib/utils';
 import { BookSearchBar } from './components/BookSearchBar';
 import { SearchResults } from './components/SearchResults';
-import { useNormalizeSearchParams } from './hooks/use-normalize-search-params';
+import { useNormalizeSearchParams } from './hooks/useNormalizeSearchParams';
 
 export function Page() {
   useNormalizeSearchParams();

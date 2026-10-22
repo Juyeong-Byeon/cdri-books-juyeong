@@ -7,7 +7,7 @@ import { BookDetailsTrigger } from './BookDetailsTrigger';
 import { BookFavoriteButton } from './BookFavoriteButton';
 import { BookHeading } from './BookHeading';
 import { BookPurchaseActions } from './BookPurchaseActions';
-import { formatBookTitle } from './utils/format-book';
+import { formatBookTitle } from './utils/formatBook';
 
 interface BookCardItemProps {
   book: Book;

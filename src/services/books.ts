@@ -1,6 +1,6 @@
 import { BOOK_PAGE_SIZE, type BookSearchConditions } from '@/types/domain/book-search';
 import type { KakaoBookSearchResponseDTO } from '@/types/dto/kakao-book';
-import { mapBookSearchPage } from './mappers/book-mapper';
+import { mapBookSearchPage } from './mappers/bookMapper';
 
 export class BookSearchError extends Error {
   constructor(

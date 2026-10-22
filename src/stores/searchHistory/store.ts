@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { safeLocalStorage } from '../util/safe-local-storage';
+import { safeLocalStorage } from '../util/safeLocalStorage';
 
 const MAX_SEARCH_HISTORY = 8;
 
