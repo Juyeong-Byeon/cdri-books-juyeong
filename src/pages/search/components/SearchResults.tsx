@@ -1,7 +1,6 @@
 import { BookCardItem } from '@/components/features/book/BookCardItem';
 import { BookEmptyState } from '@/components/features/book/BookEmptyState';
 import { BookList, BookListItem } from '@/components/features/book/BookList';
-import { BookListSkeleton } from '@/components/features/book/BookListSkeleton';
 import { cx } from '@/lib/utils';
 import { BOOK_PAGE_SIZE } from '@/types/domain/book-search';
 import { useBookSearch } from '../hooks/useBookSearch';
@@ -10,6 +9,7 @@ import { useSearchConditions } from '../hooks/useSearchConditions';
 import { SearchErrorState } from './SearchErrorState';
 import { SearchLoadMore } from './SearchLoadMore';
 import { SearchResultCount } from './SearchResultCount';
+import { BookCardSkeleton } from '@/components/features/book/BookCardSkeleton';
 
 export function SearchResults() {
   const conditions = useSearchConditions();
@@ -52,7 +52,13 @@ export function SearchResults() {
       ) : (
         <BookList aria-busy={isLoading || isFetchingNextPage}>
           {isLoading ? (
-            <BookListSkeleton count={BOOK_PAGE_SIZE} />
+            <>
+              {Array.from({ length: BOOK_PAGE_SIZE }, (_, index) => (
+                <BookListItem key={`loading:${index}`} aria-hidden="true">
+                  <BookCardSkeleton />
+                </BookListItem>
+              ))}
+            </>
           ) : (
             books.map((book) => (
               <BookListItem key={book.id}>

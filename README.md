@@ -43,14 +43,15 @@
 
 ### 2.1 기술 스택
 
-| 분류                  | 기술 / 라이브러리                |      버전      | 선정 이유                                                                                                                                                                                                      |
-| :-------------------- | :------------------------------- | :------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Framework / Build** | **Vite + React + TypeScript**    | React 19, TS 5 | - 번들 속도와 HMR이 가장 빠른 Vite 기반 구성<br/>- 과제 필수 요구사항(React, TypeScript, React Query) 본연의 컴포넌트 설계에 집중<br/>- Next.js의 불필요한 보일러플레이트 없이 가볍고 견고한 SPA 아키텍처 실현 |
-| **Server State**      | **TanStack Query (React Query)** |       v5       | - `useInfiniteQuery`를 활용한 표준 무한 스크롤 및 페이지네이션 제어<br/>- `staleTime`, `gcTime` 최적화로 동일 검색어 중복 호출 방지 및 즉각적 캐시 렌더링<br/>- 로딩, 에러, 페칭 상태의 선언적 관리            |
-| **Client State**      | **Zustand**                      |       v5       | - 찜 스냅샷과 검색 기록을 관리하는 데 사용<br/>- `persist`를 적용해 `localStorage`에 저장<br/>- Provider 없는 저장소 구성                                                                                      |
-| **Styling & UI Core** | **Tailwind CSS + Radix UI**      |  Tailwind v3   | - 디자인 토큰을 Tailwind 설정에 반영<br/>- 필요한 UI에 Radix UI 접근성 기반 구성요소 활용                                                                                                                      |
-| **Icons**             | **Lucide React**                 |      최신      | - 피그마 시안에 명시된 돋보기, 하트(찜), 아코디언 화살표, 닫기 등 일관성 있는 모던 벡터 아이콘 제공                                                                                                            |
-| **Infrastructure**    | **Cloudflare Pages + Functions** |       -        | - 클라이언트 번들에 카카오 `REST API Key`를 일절 노출하지 않는 **엣지 서버리스 프록시** 구축<br/>- CORS 원천 차단 및 글로벌 엣지 캐싱                                                                          |
+| 분류                   | 기술 / 라이브러리                |      버전      | 선정 이유                                                                                                                                                                                                      |
+| :--------------------- | :------------------------------- | :------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework / Build**  | **Vite + React + TypeScript**    | React 19, TS 5 | - 번들 속도와 HMR이 가장 빠른 Vite 기반 구성<br/>- 과제 필수 요구사항(React, TypeScript, React Query) 본연의 컴포넌트 설계에 집중<br/>- Next.js의 불필요한 보일러플레이트 없이 가볍고 견고한 SPA 아키텍처 실현 |
+| **Server State**       | **TanStack Query (React Query)** |       v5       | - `useInfiniteQuery`를 활용한 표준 무한 스크롤 및 페이지네이션 제어<br/>- `staleTime`, `gcTime` 최적화로 동일 검색어 중복 호출 방지 및 즉각적 캐시 렌더링<br/>- 로딩, 에러, 페칭 상태의 선언적 관리            |
+| **Client State**       | **Zustand**                      |       v5       | - 찜 스냅샷과 검색 기록을 관리하는 데 사용<br/>- `persist`를 적용해 `localStorage`에 저장<br/>- Provider 없는 저장소 구성                                                                                      |
+| **Styling & UI Core**  | **Tailwind CSS + Radix UI**      |  Tailwind v3   | - 디자인 토큰을 Tailwind 설정에 반영<br/>- 필요한 UI에 Radix UI 접근성 기반 구성요소 활용                                                                                                                      |
+| **Keyboard Shortcuts** | **Hotkeys.js**                   |       v4       | - 검색 기록의 방향키·Home·End 바인딩과 해제를 라이브러리에 위임<br/>- 목록에 포커스가 있을 때만 실행하고, 항목 간 포커스 이동 규칙은 페이지 훅에서 관리                                                        |
+| **Icons**              | **Lucide React**                 |      최신      | - 피그마 시안에 명시된 돋보기, 하트(찜), 아코디언 화살표, 닫기 등 일관성 있는 모던 벡터 아이콘 제공                                                                                                            |
+| **Infrastructure**     | **Cloudflare Pages + Functions** |       -        | - 클라이언트 번들에 카카오 `REST API Key`를 일절 노출하지 않는 **엣지 서버리스 프록시** 구축<br/>- CORS 원천 차단 및 글로벌 엣지 캐싱                                                                          |
 
 ### 2.2 핵심 아키텍처 설계 원칙
 

@@ -1,7 +1,7 @@
-import type { KeyboardEvent } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { cx } from '@/lib/utils';
+import { useSearchHistoryHotkeys } from '../hooks/useSearchHistoryHotkeys';
 import { useSearchHistoryScrollHint } from '../hooks/useSearchHistoryScrollHint';
 
 interface SearchHistoryListProps {
@@ -20,38 +20,7 @@ export function SearchHistoryList({
   onFocusInput,
 }: SearchHistoryListProps) {
   const { listRef, hasMoreBelow, updateScrollHint } = useSearchHistoryScrollHint(searchKeywords);
-
-  function handleKeyDown(event: KeyboardEvent<HTMLLIElement>, index: number) {
-    if (event.nativeEvent.isComposing) return;
-
-    let nextIndex: number;
-    switch (event.key) {
-      case 'ArrowUp':
-        event.preventDefault();
-        if (index === 0) {
-          onFocusInput();
-          return;
-        }
-        nextIndex = index - 1;
-        break;
-      case 'ArrowDown':
-        nextIndex = Math.min(index + 1, searchKeywords.length - 1);
-        break;
-      case 'Home':
-        nextIndex = 0;
-        break;
-      case 'End':
-        nextIndex = searchKeywords.length - 1;
-        break;
-      default:
-        return;
-    }
-
-    event.preventDefault();
-    event.currentTarget.parentElement
-      ?.querySelectorAll<HTMLButtonElement>('[data-history-select]')
-      [nextIndex]?.focus();
-  }
+  useSearchHistoryHotkeys(listRef, onFocusInput);
 
   return (
     <div className={cx('relative')}>
@@ -62,12 +31,8 @@ export function SearchHistoryList({
         onScroll={updateScrollHint}
         className={cx('max-h-[105px] overflow-y-auto overscroll-contain pb-[13px] pl-11 pr-3 pt-3')}
       >
-        {searchKeywords.map((searchKeyword, index) => (
-          <li
-            key={searchKeyword}
-            onKeyDown={(event) => handleKeyDown(event, index)}
-            className={cx('flex h-10 items-center gap-3')}
-          >
+        {searchKeywords.map((searchKeyword) => (
+          <li key={searchKeyword} className={cx('flex h-10 items-center gap-3')}>
             <Button
               type="button"
               variant="subtle-ghost"
