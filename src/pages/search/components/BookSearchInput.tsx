@@ -12,6 +12,7 @@ export function BookSearchInput() {
   const historyId = useId();
   const hintId = useId();
   const conditions = useSearchConditions();
+  const { searchKeyword: submittedSearchKeyword, target: submittedTarget } = conditions;
   const submitSearch = useSearchSubmit(conditions);
   const {
     formRef,
@@ -28,7 +29,7 @@ export function BookSearchInput() {
     handleInputKeyDown,
     handleKeyDown,
   } = useSearchInput({
-    initialSearchKeyword: conditions.target ? '' : conditions.searchKeyword,
+    initialSearchKeyword: submittedTarget ? '' : submittedSearchKeyword,
     onSearch: submitSearch,
   });
 

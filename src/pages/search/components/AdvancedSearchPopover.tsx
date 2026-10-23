@@ -18,6 +18,7 @@ import { useSearchSubmit } from '../hooks/useSearchSubmit';
 
 export function AdvancedSearchPopover() {
   const conditions = useSearchConditions();
+  const { searchKeyword: submittedSearchKeyword, target: submittedTarget } = conditions;
   const submitSearch = useSearchSubmit(conditions);
   const [open, setOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -28,8 +29,8 @@ export function AdvancedSearchPopover() {
 
   function handleOpenChange(nextOpen: boolean) {
     if (nextOpen) {
-      setSearchKeyword(conditions.target ? conditions.searchKeyword : '');
-      setTarget(conditions.target ?? 'title');
+      setSearchKeyword(submittedTarget ? submittedSearchKeyword : '');
+      setTarget(submittedTarget ?? 'title');
     }
     setOpen(nextOpen);
   }
