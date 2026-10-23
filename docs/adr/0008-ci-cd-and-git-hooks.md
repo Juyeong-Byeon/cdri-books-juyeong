@@ -25,7 +25,9 @@ npm run build
 
 - 테스트 도구와 범위는 [ADR-0012](./0012-testing-and-deployment-validation.md)를 따른다. 테스트가 0개인 실행을 기능 검증 통과로 보지 않는다.
 - `build`는 현재 타입 검사도 포함한다. CI 단계는 실패 원인을 분리해서 확인할 수 있게 유지한다.
+- `build`에서 앱 빌드 후 문서도 생성한다. [ADR-0013](./0013-documentation-site.md)의 문서 산출물이 앱과 같은 출력 폴더에 포함되므로 기존 Pages 빌드 명령을 유지한다.
 - Cloudflare 배포 환경 검증은 별도로 수행한다. GitHub Actions 설정이 있다는 이유만으로 자동 배포까지 구성됐다고 기록하지 않는다.
+- 실제 호스팅은 Pages Git 연동으로 구성한다. Pages는 연결된 브랜치의 푸시를 받아 자체 빌드·배포하며, GitHub Actions 검증과 각각 실행된다. 설정 절차는 [README의 배포 안내](../../README.md#45-cloudflare-pages-배포)에서 관리한다.
 
 ## 대안과 선택 이유
 

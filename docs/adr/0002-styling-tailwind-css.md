@@ -10,7 +10,7 @@
 
 ## 결정
 
-- 아래 색상·타이포그래피 명세를 구현 기준으로 사용하고, `tailwind.config.ts`의 `theme.extend`에 동일한 이름과 값으로 유지한다. 컴포넌트에서는 해당 토큰의 Tailwind 클래스를 사용한다.
+- 디자인에서 정한 색상·타이포그래피를 제품 코드의 토큰으로 관리한다. 컴포넌트에서는 해당 토큰의 Tailwind 클래스를 사용하며, 문서에 같은 값의 사본을 유지하지 않는다.
 - 타이포그래피 값은 `src/lib/typography.ts`에 선언하고, Tailwind의 `fontSize`와 `cx`의 글자 크기 판별이 이 정의를 공유한다. 사용자 정의 글자 크기를 글자색과 함께 병합해도 제거되지 않게 한다.
 - Tailwind CSS의 토큰과 shadcn/ui 방식의 소스 소유 구조를 유지한다. 접근성 동작이 필요한 UI는 Radix 프리미티브를 활용한다.
 - 상세검색은 버튼에 연결된 Popover와 검색 대상 선택 입력으로 구현한다. 중앙 Dialog는 사용하지 않는다.
@@ -18,48 +18,17 @@
 - Esc로 닫기, 트리거로 포커스 복귀, 선택 입력의 키보드 조작을 검증한다. 라이브러리 사용만으로 접근성 검증을 대체하지 않는다.
 - 범용 UI와 도메인 바인딩의 책임은 [ADR-0007](./0007-component-and-hook-layering.md)을 따른다.
 
-## 디자인 토큰 명세
+## 디자인 토큰 관리
 
-### 색상
+| 구분                       | 기준 코드                                      | 연결                                        |
+| -------------------------- | ---------------------------------------------- | ------------------------------------------- |
+| 색상·글꼴·모서리·등장 효과 | [tailwind.config.ts](../../tailwind.config.ts) | `theme.extend`에서 Tailwind 클래스로 제공   |
+| 타이포그래피               | [typography.ts](../../src/lib/typography.ts)   | Tailwind `fontSize`와 `cx`가 같은 정의 사용 |
+| 클래스 병합                | [utils.ts](../../src/lib/utils.ts)             | 크기 토큰과 글자색을 함께 병합              |
 
-`tailwind.config.ts`의 `theme.extend.colors`에 다음 값을 사용한다.
+색상은 `palette`·`text`·`ui`로 나누어 사용한다. 예를 들어 버튼은 `bg-palette-primary`, 본문은 `text-text-secondary`, 목록 구분선은 `border-ui-divider`를 사용한다. 타이포그래피는 `text-title2`, `text-title3`, `text-body2`, `text-caption`처럼 역할별 토큰으로 지정한다.
 
-```typescript
-colors: {
-  palette: {
-    primary: '#4880EE',   // 메인 브랜드 블루 (버튼, 활성 탭 등)
-    red: '#E84118',       // 포인트 레드 (찜하기 하트 활성)
-    gray: '#DADADA',      // 구분선 및 기본 보더
-    lightGray: '#F2F4F6', // 배경색 및 인풋 배경
-    white: '#FFFFFF',
-    black: '#222222',
-  },
-  text: {
-    primary: '#353C49',   // 메인 텍스트 (제목, 도서명)
-    secondary: '#6D7582', // 서브 텍스트 (저자, 출판사, 설명)
-    subtitle: '#8D94A0',  // 캡션 및 플레이스홀더
-  },
-}
-```
-
-사용 예: `bg-palette-primary`, `text-palette-red`, `border-palette-gray`, `bg-palette-lightGray`, `text-text-primary`, `text-text-secondary`, `placeholder:text-text-subtitle`.
-
-### 타이포그래피
-
-기본 글꼴은 `'Noto Sans KR', sans-serif`다. 아래 크기·행간·굵기를 함께 `theme.extend.fontSize`에 정의한다.
-
-| 토큰명           | Font Size | Line Height | Font Weight  | 설명                             |
-| ---------------- | --------- | ----------- | ------------ | -------------------------------- |
-| **`title1`**     | 24px      | 24px        | 700 (Bold)   | 대제목, 메인 헤더 타이틀         |
-| **`title2`**     | 22px      | 24px        | 700 (Bold)   | 섹션 타이틀, 검색 결과 타이틀    |
-| **`title3`**     | 18px      | 18px        | 700 (Bold)   | 도서 제목, 모달 타이틀           |
-| **`body1`**      | 20px      | 20px        | 500 (Medium) | 본문 강조 텍스트, 탭 라벨        |
-| **`body2`**      | 14px      | 14px        | 500 (Medium) | 기본 본문, 도서 저자/출판사 정보 |
-| **`body2-bold`** | 14px      | 14px        | 700 (Bold)   | 볼드 본문, 가격 강조             |
-| **`caption`**    | 16px      | 16px        | 500 (Medium) | 캡션 텍스트, 인풋 텍스트         |
-| **`small`**      | 10px      | 10px        | 500 (Medium) | 배지, 날짜 보조 정보             |
-
-사용 예: `text-title1`, `text-title2`, `text-title3`, `text-body1`, `text-body2`, `text-body2-bold`, `text-caption`, `text-small`. 개별 컴포넌트에서 동일한 값을 임의의 크기·색상으로 다시 선언하지 않는다.
+토큰 값이 바뀌면 제품 코드의 정의를 수정한다. 문서의 숫자 표와 코드를 수동으로 맞추는 절차는 두지 않는다.
 
 ## 대안과 선택 이유
 
@@ -78,7 +47,7 @@ colors: {
 
 ## 구현 시 확인
 
-- 색상 9개와 타이포그래피 8개의 이름·값이 위 명세와 Tailwind 설정에서 일치하는지 확인한다.
+- 토큰을 조합한 제목·본문·버튼이 의도한 크기·색상으로 표시되는지 확인한다. `cx`의 토큰 병합은 자동 테스트로 확인한다.
 - 기준 화면의 기본 카드·펼친 카드·팝업·빈 화면을 디자인과 비교한다.
 - 제목색·구분선 등 토큰 누락과 줄바꿈을 확인한다.
 - 팝업을 열고 취소해도 URL과 확정 검색 조건은 바뀌지 않는다.

@@ -19,18 +19,22 @@
 - 검색과 찜 목록은 같은 도메인 바인딩 컴포넌트를 재사용한다.
 - `Button`, 입력 UI, Popover 등의 공통 요소는 실제 사용에 필요한 범위만 만든다. 사용하지 않는 변형과 범용 설정은 미리 추가하지 않는다.
 - 검색 훅은 Query의 페이지를 목록으로 구성하고 UI에 필요한 상태와 동작을 반환한다. 오류 종류·다음 페이지 실패·재시도 기능을 숨기지 않는다.
+- URL 조건 읽기(`useSearchConditions`), 제출(`useSearchSubmit`), 결과 조회(`useBookSearch`)를 분리한다. 입력·상세검색·결과 컴포넌트는 필요한 훅을 직접 소비하고, 페이지 전체 훅의 반환 타입을 컴포넌트 props 계약으로 사용하지 않는다.
+- 교차 감지 훅 `useIntersectionObserver`는 옵션 객체의 `enabled`, `onIntersect`, `rootMargin`을 받고 관찰 대상 ref를 반환한다. Observer의 연결·해제를 맡고, `SearchResults`가 조회 훅의 추가 로딩 동작을 연결한다. 현재 사용 범위에 맞춰 검색 페이지의 `hooks/`에 둔다.
 
 ### 검색 훅의 책임
 
-| 반환 정보                       | 의미                                                                |
-| ------------------------------- | ------------------------------------------------------------------- |
-| books, totalCount               | 정규화된 현재 검색 결과와 전체 건수                                 |
-| isIdle, isLoading, isEmpty      | 검색 전·최초 요청 중·성공 후 빈 결과 구분                           |
-| error, isError                  | 최초 요청 실패 또는 기존 데이터가 있는 갱신 실패 구분에 필요한 정보 |
-| hasNextPage, isFetchingNextPage | 추가 요청 가능 여부와 진행 상태                                     |
-| isFetchNextPageError            | 다음 페이지 요청 실패 여부                                          |
-| loadMore, retry                 | 추가 페이지 요청과 최초·갱신 요청 재시도                            |
-| retryNextPage                   | 기존 결과를 유지한 추가 페이지 재시도                               |
+| 반환 정보                       | 의미                                                                 |
+| ------------------------------- | -------------------------------------------------------------------- |
+| books, totalCount               | 정규화된 현재 검색 결과와 전체 건수                                  |
+| isIdle, isLoading, isEmpty      | 검색 전·최초 요청 중·성공 후 빈 결과 구분                            |
+| error, isError                  | 최초 요청 실패 또는 기존 데이터가 있는 갱신 실패 구분에 필요한 정보  |
+| isFetching                      | 최초·갱신·추가 요청을 포함한 요청 진행 여부                          |
+| hasNextPage, isFetchingNextPage | 추가 요청 가능 여부와 진행 상태                                      |
+| canLoadMore                     | 검색 조건·다음 페이지·진행 중 요청·오류를 고려한 추가 요청 허용 여부 |
+| isFetchNextPageError            | 다음 페이지 요청 실패 여부                                           |
+| loadMore, retry                 | 추가 페이지 요청과 최초·갱신 요청 재시도                             |
+| retryNextPage                   | 기존 결과를 유지한 추가 페이지 재시도                                |
 
 `isIdle`은 제출된 유효한 검색 조건이 없는 상태로 정의한다. Query v5에서 비활성 쿼리의 `isPending`만 보고 로딩 UI를 표시하지 않는다. `isEmpty`는 유효한 검색이 성공하고 목록이 비었을 때만 참이다.
 

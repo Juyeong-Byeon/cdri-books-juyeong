@@ -6,17 +6,17 @@
 
 ## 확정한 결정과 근거 문서
 
-| 선택             | 확정 내용                                                                      | ADR                                                                                                  |
-| ---------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| 1. 구현 범위     | 기본 기능·디자인·핵심 테스트에 URL 동기화를 필수로 포함                        | [0009](./0009-ux-resilience-and-testing-strategy.md), [0010](./0010-url-search-state-and-history.md) |
-| 2. 계층 분리     | ExpandableCard와 도메인 바인딩, DTO·도메인·매퍼를 별도 계층으로 유지           | [0006](./0006-dto-domain-mapping-layer.md), [0007](./0007-component-and-hook-layering.md)            |
-| 3. API 실행·배포 | Vite 프록시와 Cloudflare Functions 유지, /api/books 통일, 실제 배포 검색 검증  | [0005](./0005-cors-proxy-cloudflare-pages.md)                                                        |
-| 4. 영속 상태     | Zustand + persist로 찜 스냅샷과 최근 검색어 관리                               | [0004](./0004-client-state-zustand.md)                                                               |
-| 5. 오류          | API 오류는 React Query 상태 UI, ErrorBoundary는 렌더링 오류 담당               | [0011](./0011-query-errors-and-render-boundary.md)                                                   |
-| 6. 테스트        | Vitest·RTL·MSW 핵심 테스트와 실제 배포 검증, Playwright는 필수에서 제외        | [0012](./0012-testing-and-deployment-validation.md)                                                  |
-| 7. 방문 기록     | 검색 제출·화면 전환은 push, 화면 전환 시 검색 조건 유지, 스크롤은 URL에서 제외 | [0010](./0010-url-search-state-and-history.md)                                                       |
-| 8. 상세검색 UI   | 버튼 아래 Popover와 검색 대상 선택, 제출 시 적용, Esc와 포커스 복귀            | [0002](./0002-styling-tailwind-css.md)                                                               |
-| 9. 도메인 데이터 | 숫자·배열·날짜 의미 유지, 표시 포맷 별도, Book 스냅샷 저장                     | [0006](./0006-dto-domain-mapping-layer.md)                                                           |
+| 선택             | 확정 내용                                                                           | ADR                                                                                                  |
+| ---------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 1. 구현 범위     | 기본 기능·디자인·핵심 테스트에 URL 동기화를 필수로 포함                             | [0009](./0009-ux-resilience-and-testing-strategy.md), [0010](./0010-url-search-state-and-history.md) |
+| 2. 계층 분리     | ExpandableCard와 도메인 바인딩, DTO·도메인·매퍼를 별도 계층으로 유지                | [0006](./0006-dto-domain-mapping-layer.md), [0007](./0007-component-and-hook-layering.md)            |
+| 3. API 실행·배포 | Vite 프록시와 Cloudflare Pages Functions 유지, /api/books 통일, 실제 배포 검색 검증 | [0005](./0005-cors-proxy-cloudflare-pages.md)                                                        |
+| 4. 영속 상태     | Zustand + persist로 찜 스냅샷과 최근 검색어 관리                                    | [0004](./0004-client-state-zustand.md)                                                               |
+| 5. 오류          | API 오류는 React Query 상태 UI, ErrorBoundary는 렌더링 오류 담당                    | [0011](./0011-query-errors-and-render-boundary.md)                                                   |
+| 6. 테스트        | Vitest·RTL·MSW 핵심 테스트와 실제 배포 검증, Playwright는 필수에서 제외             | [0012](./0012-testing-and-deployment-validation.md)                                                  |
+| 7. 방문 기록     | 검색 제출·화면 전환은 push, 화면 전환 시 검색 조건 유지, 스크롤은 URL에서 제외      | [0010](./0010-url-search-state-and-history.md)                                                       |
+| 8. 상세검색 UI   | 버튼 아래 Popover와 검색 대상 선택, 제출 시 적용, Esc와 포커스 복귀                 | [0002](./0002-styling-tailwind-css.md)                                                               |
+| 9. 도메인 데이터 | 숫자·배열·날짜 의미 유지, 표시 포맷 별도, Book 스냅샷 저장                          | [0006](./0006-dto-domain-mapping-layer.md)                                                           |
 
 기획의 Enter 검색·10개씩 무한 스크롤·최근 검색어 최대 8개·찜 시점 데이터 보관은 선택 사항이 아닌 구현 전제다.
 
@@ -47,10 +47,13 @@
 | [0010](./0010-url-search-state-and-history.md)       | URL 단일 기준과 브라우저 방문 기록        |
 | [0011](./0011-query-errors-and-render-boundary.md)   | API 오류 UI와 렌더링 경계                 |
 | [0012](./0012-testing-and-deployment-validation.md)  | 핵심 자동 테스트와 실제 환경 검증         |
+| [0013](./0013-documentation-site.md)                 | 원본 Markdown 기반 문서 사이트 동시 배포  |
 
 ## 구현과 검증 현황
 
 현재 구현 범위와 남은 작업은 [프로젝트 README의 5절](../../README.md#5-폴더-구조-및-주요-코드-설명)에서 관리한다.
+
+공개 사이트 주소는 README 최상단, 배포 방법은 [실행·배포 안내](../../README.md#45-cloudflare-pages-배포), 확인한 범위는 [배포 및 실제 환경 확인](../../README.md#배포-및-실제-환경-확인)을 참고한다. 주소·테스트 수·실행 결과를 ADR마다 중복 기록하지 않는다.
 
 Git 훅·CI의 검증 명령은 [ADR-0008](./0008-ci-cd-and-git-hooks.md), 필요한 자동 테스트와 실제 환경 검증의 범위는 [ADR-0012](./0012-testing-and-deployment-validation.md)를 따른다.
 

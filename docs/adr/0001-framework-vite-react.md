@@ -1,7 +1,7 @@
 # ADR-0001: 번들러 및 런타임으로 Vite + React + TypeScript 선정
 
 - **상태 (Status)**: 승인 (Accepted)
-- **일자 (Date)**: 2026-10-22
+- **결정·개정 일자**: 2026-10-23
 - **결정자 (Deciders)**: 변주영
 
 ---
@@ -29,7 +29,7 @@
   - Esbuild 기반의 초고속 HMR(Hot Module Replacement)과 빠른 개발 빌드 속도.
   - 표준적인 React SPA 환경으로, TanStack Query(React Query)의 캐싱 및 라이프사이클(`useInfiniteQuery`)을 군더더기 없이 구현 가능.
   - 과제 필수 요구사항인 "React, TypeScript, React Query" 본연의 컴포넌트 설계 및 커스텀 훅 작성에 오롯이 집중할 수 있음.
-  - 배포 시 Cloudflare Pages(`_redirects` 및 `Functions`)와의 완벽한 궁합으로 API 보안 및 CORS를 해결할 수 있음.
+  - Cloudflare Pages에서 정적 SPA를 제공하고 Pages Functions에서 같은 출처의 API 프록시를 구성할 수 있음.
 - **단점**:
   - 순수 브라우저 CSR이므로 개발 서버(`vite.config.ts`) 및 배포 환경(Cloudflare / Vercel)에서의 프록시 설정이 별도로 필요함.
 
@@ -47,4 +47,4 @@
   - 과제 평가 기준인 **"재사용 가능한 컴포넌트 설계"**, **"클린 코드 및 가독성"**, **"React Query 상태 관리"** 역량을 가장 명확하게 보여줄 수 있습니다.
   - 프레임워크 특유의 종속성 없이 표준적인 모던 React 코딩 패턴을 유지할 수 있습니다.
 - **대응 과제**:
-  - API Key 은닉과 CORS 해결을 위해 로컬 개발 환경 프록시(`vite.config.ts`)와 배포 환경(Cloudflare Pages Functions / `_redirects`) 설정을 체계적으로 구성해야 합니다. (이는 [ADR-0005](./0005-cors-proxy-cloudflare-pages.md)에서 다룸)
+  - API Key를 서버에서 관리하기 위해 로컬 Vite 프록시와 배포용 Cloudflare Pages Functions를 구성해야 합니다. 배포·라우팅 기준은 [ADR-0005](./0005-cors-proxy-cloudflare-pages.md)를 따릅니다.

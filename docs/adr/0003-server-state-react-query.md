@@ -17,8 +17,9 @@
 - 쿼리 키는 `getBookSearchQueryKey`에서 정규화된 검색어·대상·정렬·페이지 크기로 구성한다. 예: `['books', { searchKeyword, target, sort, size: 10 }]`.
 - 첫 페이지는 1, 페이지 크기는 10으로 요청한다. 페이지 번호는 쿼리 키와 URL에 넣지 않고 `pageParam`으로 관리한다.
 - 검색어가 비어 있으면 쿼리를 비활성화한다. 검색 전 상태와 검색 성공 후 빈 결과를 구분한다.
-- `getNextPageParam`은 `meta.is_end`와 API의 허용 페이지 범위를 기준으로 종료한다.
-- `IntersectionObserver`는 다음 페이지가 있고 요청 중이 아닐 때만 추가 요청한다. 실패 후에는 관찰만으로 반복 요청하지 않고 재시도 UI를 제공한다.
+- `getNextPageParam`은 매핑된 페이지의 `meta.isEnd`, 빈 도서 목록, API의 허용 페이지 범위를 기준으로 종료한다.
+- 추가 요청 가능 여부는 `useBookSearch`의 `canLoadMore`와 `loadMore`에서 결정한다. 실패 후에는 관찰만으로 반복 요청하지 않고 재시도 UI를 제공한다.
+- 교차 감지는 `useIntersectionObserver`가 맡고, 관찰 활성화·콜백·여유 범위는 `SearchResults`에서 옵션으로 전달한다. 교차 감지 훅은 Query와 도서 데이터에 의존하지 않는다.
 - 쿼리의 `AbortSignal`을 HTTP 요청에 전달한다. 조건 변경 시 새 쿼리 키를 사용하고 기존 페이지를 새 결과에 합치지 않는다.
 - 동일 식별자의 중복 문서는 목록을 구성하는 단계에서 정리한다.
 

@@ -1,10 +1,14 @@
+**배포 링크: [cdri.y-one.org](https://cdri.y-one.org)**
+
+**설계 문서: [ADR 모아보기](https://cdri.y-one.org/docs/adr/)**
+
 # 📚 CERTICOS BOOKS (cdri-books-juyeong)
 
 > **CDRI 프론트엔드 채용 사전과제**
 >
 > 카카오 Daum 책 검색 API를 연동한 도서 검색 및 찜하기 웹 애플리케이션입니다.
 >
-> 현재 코드의 기능과 구조를 설명합니다. 남은 구현·검증 항목은 5절에 정리했습니다.
+> 현재 코드의 기능과 구조를 설명합니다. 구현 구조와 자동 검증·배포 확인 결과는 5절에 정리했습니다.
 
 ---
 
@@ -12,7 +16,7 @@
 
 1. [프로젝트 개요](#1-프로젝트-개요)
 2. [기술 스택 및 아키텍처 설계 원칙](#2-기술-스택-및-아키텍처-설계-원칙)
-3. [피그마 디자인 시스템 토큰 스펙](#3-피그마-디자인-시스템-토큰-스펙)
+3. [디자인 토큰](#3-디자인-토큰)
 4. [실행 방법 및 환경 설정](#4-실행-방법-및-환경-설정)
 5. [폴더 구조 및 주요 코드 설명](#5-폴더-구조-및-주요-코드-설명)
 6. [핵심 기능 및 비즈니스 로직](#6-핵심-기능-및-비즈니스-로직)
@@ -27,7 +31,7 @@
 - **프로젝트명**: CERTICOS BOOKS
 - **저장소명**: `cdri-books-juyeong`
 - **지원자**: 변주영
-- **배포 대상**: Cloudflare Pages + Functions
+- **배포 환경**: Cloudflare Pages + Functions
 - **주요 기능**:
   - 카카오 Daum 도서 검색 API 연동 (키워드 검색, 상세 조건 검색)
   - `IntersectionObserver` 기반 무한 스크롤 (Infinite Scroll)
@@ -56,6 +60,7 @@
 | **Icons**              | **Lucide React + 제공된 SVG**    |         -         | - 돋보기·화살표·닫기 등 공통 아이콘은 Lucide React 사용<br/>- 하트와 빈 상태 아이콘은 제공된 SVG로 디자인 반영                                          |
 | **Infrastructure**     | **Cloudflare Pages + Functions** |         -         | - 배포용 서버 프록시에서 카카오 인증 헤더 구성<br/>- 개발·배포에서 브라우저가 같은 출처의 `/api/books`를 호출하도록 구성                                |
 | **Testing**            | **Vitest + RTL + MSW**           | Vitest v3, MSW v2 | - 사용자 조작과 HTTP 요청 경계를 함께 검증<br/>- 실제 API 키 없이 오류·재시도·추가 페이지 응답 재현<br/>- 앱의 실제 Provider 설정으로 재시도 정책 검증  |
+| **Documentation**      | **VitePress**                    |        v1         | - 기존 Markdown에서 정적 문서·사이드바·검색 생성<br/>- 앱과 같은 Pages 배포에 포함하며 문서 본문을 따로 복사하지 않음                                   |
 
 ### 2.2 핵심 아키텍처 설계 원칙
 
@@ -71,42 +76,17 @@
 
 ---
 
-## 3. 피그마 디자인 시스템 토큰 스펙
+## 3. 디자인 토큰
 
-피그마 디자인 시안을 반영한 디자인 토큰입니다:
+디자인의 색상·타이포그래피를 Tailwind 토큰으로 사용합니다. 구체적인 값은 아래 코드에서 관리하며, 문서에 같은 수치 표를 별도로 유지하지 않습니다.
 
-### 3.1 컬러 팔레트
+| 구분                        | 정의 위치                                  | 사용 방식                                                        |
+| --------------------------- | ------------------------------------------ | ---------------------------------------------------------------- |
+| 색상·글꼴·모서리·등장 효과  | [tailwind.config.ts](./tailwind.config.ts) | `bg-palette-primary`, `text-text-secondary`, `border-ui-divider` |
+| 타이포그래피 크기·행간·굵기 | [typography.ts](./src/lib/typography.ts)   | `text-title2`, `text-title3`, `text-body2`, `text-caption`       |
+| 클래스 병합                 | [utils.ts](./src/lib/utils.ts)             | `className={cx(...)}`                                            |
 
-```typescript
-colors: {
-  palette: {
-    primary: '#4880EE',   // 메인 브랜드 블루 (검색 버튼, 구매하기, 활성 탭)
-    red: '#E84118',       // 포인트 레드 (찜하기 하트 활성)
-    gray: '#DADADA',      // 구분선 및 기본 보더
-    lightGray: '#F2F4F6', // 배경색 및 인풋 배경
-    white: '#FFFFFF',
-    black: '#222222',
-  },
-  text: {
-    primary: '#353C49',   // 메인 텍스트 (제목, 도서명)
-    secondary: '#6D7582', // 서브 텍스트 (저자, 출판사, 설명)
-    subtitle: '#8D94A0',  // 캡션 및 플레이스홀더
-  },
-}
-```
-
-### 3.2 타이포그래피 (Noto Sans KR)
-
-| 토큰명           | Font Size | Line Height | Font Weight  | 용도                             |
-| :--------------- | :-------: | :---------: | :----------: | :------------------------------- |
-| **`title1`**     |   24px    |    24px     |  700 (Bold)  | 대제목, 메인 헤더 타이틀         |
-| **`title2`**     |   22px    |    24px     |  700 (Bold)  | 섹션 타이틀, 검색 결과 타이틀    |
-| **`title3`**     |   18px    |    18px     |  700 (Bold)  | 도서 제목, 모달 타이틀           |
-| **`body1`**      |   20px    |    20px     | 500 (Medium) | 본문 강조 텍스트, 탭 라벨        |
-| **`body2`**      |   14px    |    14px     | 500 (Medium) | 기본 본문, 도서 저자/출판사 정보 |
-| **`body2-bold`** |   14px    |    14px     |  700 (Bold)  | 볼드 본문, 가격 강조             |
-| **`caption`**    |   16px    |    16px     | 500 (Medium) | 캡션 텍스트, 인풋 텍스트         |
-| **`small`**      |   10px    |    10px     | 500 (Medium) | 배지, 날짜 보조 정보             |
+Tailwind와 `cx`는 같은 타이포그래피 정의를 공유합니다. 제목·본문의 크기와 글자색 클래스를 함께 써도 클래스 병합 과정에서 서로 제거되지 않도록 구성했습니다. 설계 배경은 [ADR-0002](./docs/adr/0002-styling-tailwind-css.md)를 참고합니다.
 
 ---
 
@@ -155,7 +135,7 @@ npm run dev
 ### 4.4 빌드 및 로컬 미리보기
 
 ```bash
-# 프로덕션 빌드 및 타입 검사
+# 앱·문서 프로덕션 빌드 및 타입 검사
 npm run build
 
 # .env.dev의 키를 Vite 프록시에 사용해 빌드 결과물 미리보기
@@ -163,6 +143,34 @@ npm run preview -- --mode dev
 ```
 
 기본 `npm run preview`는 production 모드로 실행되어 `.env.dev`를 읽지 않습니다. 위 명령은 `dev` 모드로 환경 변수를 읽고 Vite 프록시를 사용합니다. Pages Functions는 실행하지 않으므로 실제 배포 함수의 동작은 Cloudflare 실행·배포 환경에서 별도로 확인해야 합니다.
+
+### 4.5 Cloudflare Pages 배포
+
+1. Cloudflare의 **Workers & Pages → Create application**에서 하단의 **Continue to Pages**를 선택합니다. 이어서 **Import an existing Git repository → Get started**로 이동해 GitHub 저장소를 연결합니다. 기본 **Continue with GitHub**는 Workers 생성으로 이어집니다. [공식 Git 연동 안내](https://developers.cloudflare.com/pages/get-started/git-integration/)
+2. Production branch는 `main`, Build command는 `npm run build`, Build output directory는 `dist`, Root directory는 저장소 루트로 설정합니다. Node.js는 `.nvmrc`의 22 버전을 사용합니다.
+3. Pages 프로젝트의 **Settings → Variables and Secrets**에 `KAKAO_REST_API_KEY`를 암호화된 Secret으로 등록하고 재배포합니다. Preview에서도 검색하려면 해당 환경에도 등록합니다. [Secret 설정 안내](https://developers.cloudflare.com/pages/functions/bindings/#secrets)
+4. 배포 후 검색과 추가 페이지 로딩, `/favorites` 직접 접속·새로고침, `/api/books?query=리액트&page=1&size=10`의 JSON 응답을 확인합니다.
+
+`Deploy command: npx wrangler deploy`가 표시되는 화면은 Workers 빌드 설정입니다. 이 프로젝트의 Pages Git 연동 배포는 빌드 명령과 출력 폴더를 지정하면 배포를 자동으로 수행합니다. 저장소 루트의 `functions/api/books.ts`도 함께 처리합니다.
+
+SPA 경로는 [Pages의 기본 SPA fallback](https://developers.cloudflare.com/pages/configuration/serving-pages/#single-page-application-spa-rendering)을 사용합니다. 루트에 `404.html`을 추가하지 않으며, `/* /index.html 200` 형태의 중복 `_redirects` 규칙은 두지 않습니다.
+
+### 4.6 문서 사이트
+
+`npm run build`는 앱을 빌드한 뒤 VitePress 문서를 `dist/docs/`에 생성합니다. Pages의 빌드 명령과 출력 폴더는 4.5절 설정을 그대로 사용합니다. 배포 시 `/docs/`는 프로젝트 개요, `/docs/adr/`는 ADR 목록을 제공합니다.
+
+```bash
+# 문서 개발 서버: http://localhost:5174/docs/
+npm run docs:dev
+
+# 문서만 빌드
+npm run docs:build
+
+# 빌드된 문서 미리보기: http://localhost:4174/docs/
+npm run docs:preview
+```
+
+본문은 루트 `README.md`와 `docs/adr/*.md`를 수정합니다. `docs/index.md`는 README를 포함하는 진입점이고, ADR 사이드바는 파일의 제목에서 자동으로 생성합니다. 코드 파일 링크는 GitHub 원문으로 연결합니다. 검색·문서 내 목차·이전/다음 문서·화면 모드는 VitePress 기본 테마를 사용합니다. 자세한 선택 이유는 [ADR-0013](./docs/adr/0013-documentation-site.md)을 참고합니다.
 
 ---
 
@@ -173,12 +181,12 @@ npm run preview -- --mode dev
 ```text
 cdri-books-juyeong/
 ├── docs/
-│   └── adr/                  # 아키텍처 결정 기록
+│   ├── .vitepress/config.ts  # 문서 사이트·자동 사이드바·링크 변환
+│   ├── index.md              # 루트 README 포함
+│   └── adr/                  # 아키텍처 결정 기록 원본
 ├── functions/
 │   └── api/
 │       └── books.ts          # Cloudflare Pages 엣지 프록시 함수 (API Key 은닉 & CORS 방지)
-├── public/
-│   └── _redirects            # Cloudflare Pages 라우팅 및 폴백 설정
 ├── server/
 │   └── createBookSearchConfigurationError.ts # 개발·배포의 키 누락 응답
 ├── src/
@@ -203,7 +211,7 @@ cdri-books-juyeong/
 │   │       │   ├── AdvancedSearchPopover.tsx
 │   │       │   ├── SearchResultCount.tsx
 │   │       │   └── SearchErrorState.tsx
-│   │       ├── hooks/              # URL 조건·검색 제출·조회·스크롤·검색 기록
+│   │       ├── hooks/              # URL 조건·검색 제출·조회·교차 감지·검색 기록
 │   │       └── utils/              # URL 검색 조건 파싱·직렬화와 쿼리 키 생성
 │   ├── stores/
 │   │   ├── favorites/
@@ -237,14 +245,15 @@ cdri-books-juyeong/
 - **`ExpandableCard.tsx`**: 도서 모델에 의존하지 않고 미디어·제목·상세·액션 슬롯을 배치합니다. Radix Collapsible로 상세 토글의 키보드 조작과 ARIA 연결을 구성합니다.
 - **`BookCover.tsx`**: 기본 48×68px·확대 210×280px 공간을 확보하며 이미지 로딩 Skeleton과 빈 표지·로드 실패 대체 표시를 처리합니다.
 - **`useBookSearch.ts`**: URL에서 읽은 확정 조건을 쿼리 키로 사용합니다. React Query가 페이지·취소·캐시를 관리하고, 훅에서 중복 도서를 제거해 뷰에 전달합니다. 추가 페이지 오류가 발생하면 기존 결과를 유지하고 명시적인 재시도를 기다립니다.
-- **`useSearchConditions.ts` / `useSearchSubmit.ts`**: URL에서 확정 조건을 읽고, 검색 제출 시 URL과 최근 검색어를 갱신합니다. 같은 조건을 다시 제출하면 현재 검색을 명시적으로 갱신합니다.
+- **`useSearchConditions.ts` / `useSearchSubmit.ts`**: URL 조건 읽기와 제출 동작을 분리했습니다. 입력·상세검색·결과 컴포넌트가 각자 필요한 훅을 소비하며, 페이지 전체 훅의 반환 객체를 props로 전달하지 않습니다. 제출 시 URL과 최근 검색어를 갱신하고, 같은 조건의 재제출은 현재 검색을 명시적으로 갱신합니다.
+- **`useIntersectionObserver.ts`**: `enabled`, `onIntersect`, `rootMargin` 옵션으로 관찰 대상의 ref와 Observer 수명을 관리합니다. `SearchResults`가 교차 시 실행할 `loadMore`를 연결하고, 추가 요청 가능 여부는 `useBookSearch`가 결정합니다. 이 훅은 현재 검색 페이지 안에서 사용합니다.
 - **`useSearchHistoryHotkeys.ts` / `useSearchHistoryScrollHint.ts`**: 검색 기록의 키 바인딩과 하단 스크롤 힌트를 관리합니다. 목록 안에서만 키 동작을 실행하고, 더 내려갈 기록이 있으면 하단을 흐리게 표시합니다.
 - **`bookMapper.ts`**: 유효한 ISBN-13·ISBN-10 또는 URL로 ID를 만들고, 미제공 가격을 `null`로 변환해 0원과 구분합니다. 가격·저자 표시 형식은 카드의 표시 유틸리티에서 처리합니다.
 - **Zustand 저장소**: 찜 도서는 저장 시점의 스냅샷으로 보관하고, 최근 검색어는 중복을 맨 앞으로 이동해 최대 8개까지 저장합니다. 손상된 저장 데이터와 localStorage 접근 실패가 앱 중단 원인이 되지 않도록 처리합니다.
 
 ### 자동 검증 현황
 
-`npm run test:run`으로 실행합니다. 2026-10-23 로컬 실행에서 **13개 파일·72개 테스트가 통과**했습니다. 테스트는 실제 API 키를 사용하지 않으며, 처리하지 않은 네트워크 요청이 있으면 실패합니다.
+`npm run test:run`으로 실행합니다. 2026-10-23 커밋 `49db325`의 push 훅에서 **13개 파일·72개 테스트가 통과**했습니다. 테스트는 실제 API 키를 사용하지 않으며, 처리하지 않은 네트워크 요청이 있으면 실패합니다.
 
 - **도메인·저장소**: ISBN·URL ID, 가격·빈 필드·표시 형식, 찜 스냅샷·해제·저장 복원, 손상·차단된 저장소, 검색 기록 중복 이동·최대 8개·삭제·이전 형식 복원.
 - **검색 UI·URL**: 입력과 제출 구분, 공백 처리, 상세검색 대상 전달·상호 초기화·취소·포커스, 검색 기록 키보드 이동·선택·삭제, URL 정규화·push·replace·뒤로가기·앞으로가기·탭 조건 보존·캐시 재사용.
@@ -253,9 +262,11 @@ cdri-books-juyeong/
 
 테스트 구성과 필수 범위는 [ADR-0012](./docs/adr/0012-testing-and-deployment-validation.md)를 참고합니다. 공통 렌더 헬퍼는 실제 `RootProvider`를 사용하고 종료 시 QueryClient를 정리합니다. Zustand·localStorage·MSW 핸들러와 현재 URL은 각 테스트 후 초기화합니다. 브라우저 방문 기록 전체를 지우는 것은 JSDOM에서도 지원하지 않으므로 테스트는 현재 진입점에서의 이동과 상대적인 기록 증가를 확인합니다.
 
-### 남은 구현·검증
+### 배포 및 실제 환경 확인
 
-- **실제 환경 검증**: Cloudflare 키 바인딩과 배포 후 검색·추가 페이지 로딩, 브라우저 재시작 후 저장 복원, 기준 디자인·키보드·포커스 동작 검증은 미완료입니다. 빌드나 현재 테스트의 성공으로 이 범위의 완료를 대신하지 않습니다.
+2026-10-23 최상단 배포 주소에서 HTTPS 메인 HTML의 HTTP 200 응답과 `CERTICOS BOOKS - 도서 검색` 제목을 확인했습니다.
+
+실제 배포 환경의 API 검색·추가 페이지 로딩·직접 경로 새로고침, 브라우저 재시작 후 저장 복원, 디자인·키보드·포커스에 대한 최종 확인 결과는 아직 기록하지 않았습니다. 공개 페이지 응답 확인과 로컬 자동 테스트 결과를 이 기능들의 운영 검증 완료로 확대하지 않습니다.
 
 ---
 
@@ -277,10 +288,10 @@ cdri-books-juyeong/
   - 전체 검색 진행 시: 이전 상세 검색 조건 및 입력 필드는 **자동 초기화**됩니다.
 - **정렬 조건**: URL의 `sort`를 사용하며 `accuracy`가 기본값이고 `latest`를 허용합니다. 별도의 정렬 선택 UI는 제공하지 않습니다.
 
-### 2) 검색 기록 관리 (`searchHistoryStore`)
+### 2) 검색 기록 관리 (`useSearchHistoryStore`)
 
 - **최대 저장 개수**: **최대 8개** 저장
-- **FIFO 큐 정책**: 8개를 초과하여 새 검색어가 유입될 경우, **가장 오래된 검색어부터 자동으로 삭제**됩니다.
+- **최근 제출순 보관**: 8개를 초과하면 마지막으로 제출한 시점이 가장 오래된 검색어를 제거합니다.
 - **중복 처리**: 이미 존재하는 검색어를 재입력할 경우, 중복 저장되지 않고 최상단(최신 순)으로 위치가 갱신됩니다.
 - **영속성**: 브라우저를 재시작하거나 새로고침한 후에도 검색 기록 목록을 `localStorage`에서 복원합니다.
 - **기록 선택**: 저장된 기록이 있을 때 검색창에 포커스하면 목록이 열립니다. 항목을 선택하면 해당 검색어로 전체 검색을 실행합니다. 방향키·Tab·Home·End로 이동하고 Escape나 바깥 클릭으로 닫을 수 있습니다.
@@ -296,7 +307,7 @@ cdri-books-juyeong/
 
 - **스냅샷 보관 정책**: 찜하기 버튼을 누른 **그 시점의 도서 데이터(제목, 가격, 표지 등)를 스냅샷 형태로 보관**합니다. 따라서 이후 카카오 API의 실시간 응답 데이터가 변동되더라도 찜한 시점의 데이터가 보존됩니다.
 - **영속성**: 브라우저를 닫거나 재시작한 후에도 찜한 도서 목록을 `localStorage`에서 복원합니다.
-- **동기화**: [도서 검색] 화면과 [내가 찜한 책] 화면은 같은 찜 저장소를 사용합니다.
+- **화면 간 공유**: 같은 앱 안의 [도서 검색] 화면과 [내가 찜한 책] 화면이 하나의 찜 저장소를 구독합니다.
 - **찜 목록 화면**: 저장된 도서 건수와 카드를 표시하며 상세 펼침·구매·찜 해제를 지원합니다. 마지막 도서를 해제하면 건수가 0으로 갱신되고, 공통 도서 아이콘과 `찜한 책이 없습니다.` 안내를 표시합니다.
 
 ---
@@ -355,16 +366,17 @@ Git 훅과 GitHub Actions에서 아래 검증 명령을 실행합니다.
   - 변경된(Staged) 파일에 대해 `eslint --fix` 및 `prettier --write` 자동 실행
   - 앱·설정의 TypeScript 빌드 검사와 Pages Functions 타입 검사 (`npm run typecheck`)
 - **`pre-push`**:
-  - 원격 저장소 전송 전 단위 및 컴포넌트 테스트 전수 검증 (`npm run test:run` ➔ `vitest run`)
+  - 원격 저장소 전송 전 단위·컴포넌트·통합 테스트 전수 검증 (`npm run test:run` ➔ `vitest run`)
 
 ### 8.2 GitHub Actions CI 파이프라인 (`.github/workflows/ci.yml`)
 
 - **실행 환경**: Node.js `v22.x`
 - **트리거**: `main` 브랜치 푸시 및 `main`을 대상으로 하는 PR(Pull Request)
 - **검증 단계**: `npm ci` ➔ `typecheck` ➔ `format:check` ➔ `lint` ➔ `test:run` ➔ `build`
+- **배포 실행**: Cloudflare Pages의 Git 연동이 같은 브랜치의 푸시를 받아 자체 빌드·배포합니다. GitHub Actions 검증과 Pages 배포는 각각 실행됩니다.
 
 ---
 
 ## 9. 아키텍처 결정 기록 (ADR)
 
-의사결정의 배경·대안·트레이드오프와 ADR-0001~0012 전체 목록은 [ADR 인덱스](./docs/adr/README.md)에서 확인할 수 있습니다. 각 ADR의 Accepted는 설계 결정의 승인을 뜻합니다. 현재 구현 범위와 남은 작업은 이 README의 [5절](#5-폴더-구조-및-주요-코드-설명)에 정리합니다.
+의사결정의 배경·대안·트레이드오프와 전체 목록은 [ADR 인덱스](./docs/adr/README.md)에서 확인할 수 있습니다. 각 ADR의 Accepted는 설계 결정의 승인을 뜻합니다. 현재 구현 범위와 남은 작업은 이 README의 [5절](#5-폴더-구조-및-주요-코드-설명)에 정리합니다.
