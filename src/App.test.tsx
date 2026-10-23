@@ -1,21 +1,10 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { App } from './App';
+import { renderApp } from './test/renderApp';
 
 describe('App navigation', () => {
   it('switches the visible section when a navigation tab is selected', async () => {
-    const user = userEvent.setup();
-    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <App />
-        </MemoryRouter>
-      </QueryClientProvider>
-    );
+    const { user } = renderApp();
 
     expect(screen.getByRole('heading', { level: 1, name: '도서 검색' })).toBeInTheDocument();
 

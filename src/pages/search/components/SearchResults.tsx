@@ -4,7 +4,7 @@ import { BookList, BookListItem } from '@/components/features/book/BookList';
 import { cx } from '@/lib/utils';
 import { BOOK_PAGE_SIZE } from '@/types/domain/book-search';
 import { useBookSearch } from '../hooks/useBookSearch';
-import { useLoadMore } from '../hooks/useLoadMore';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { useSearchConditions } from '../hooks/useSearchConditions';
 import { SearchErrorState } from './SearchErrorState';
 import { SearchLoadMore } from './SearchLoadMore';
@@ -30,7 +30,11 @@ export function SearchResults() {
     retry,
     retryNextPage,
   } = useBookSearch(conditions);
-  const sentinelRef = useLoadMore(canLoadMore, loadMore);
+  const sentinelRef = useIntersectionObserver({
+    enabled: canLoadMore,
+    onIntersect: loadMore,
+    rootMargin: '200px',
+  });
 
   return (
     <>

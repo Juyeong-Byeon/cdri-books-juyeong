@@ -25,7 +25,12 @@ export function BookFavoriteButton({ book, expanded }: BookFavoriteButtonProps) 
       onClick={() => toggleFavorite(book)}
       className={cx('absolute right-0 top-0', expanded && 'right-1 top-1')}
     >
-      <HeartIcon filled={isFavorite} />
+      <HeartIcon
+        filled={isFavorite}
+        className={cx(
+          !isFavorite && 'text-palette-white drop-shadow-[0_0_1px_theme(colors.palette.black)]'
+        )}
+      />
     </Button>
   );
 }

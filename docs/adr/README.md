@@ -31,7 +31,7 @@
 
 ## ADR 목록
 
-모든 문서의 설계 상태는 승인 (Accepted), 결정 또는 개정 일자는 2026-10-22다.
+모든 문서의 설계 상태는 승인 (Accepted)이다. 결정·개정 일자는 각 문서에서 관리한다.
 
 | 번호                                                 | 결정                                      |
 | ---------------------------------------------------- | ----------------------------------------- |
@@ -50,16 +50,8 @@
 
 ## 구현과 검증 현황
 
-현재 RootProvider(QueryClient·BrowserRouter), 검색·찜 경로를 가진 기본 앱 셸, 화면 콘텐츠용 ErrorBoundary, `src/stores/favorites/`, `src/stores/searchHistory/`, `src/stores/util/`의 Zustand 저장소 코드가 구현되어 있다. 검색·찜 기능 UI와 API 연동은 아직 완료되지 않았다.
+현재 구현 범위와 남은 작업은 [프로젝트 README의 5절](../../README.md#5-폴더-구조-및-주요-코드-설명)에서 관리한다.
 
-다음 항목은 후속 구현·검증이 필요하다.
-
-- 초기 화면 이후의 검색·찜·기록·상세 팝업·URL 기능
-- 개발 API 경로 통일과 rewrite의 쿼리 누락 수정
-- 필요한 Popover·선택 입력 구성과 MSW 의존성·테스트 추가
-- React Query 오류·재시도 정책과 저장·복원 구현
-- Cloudflare 키 바인딩·배포·실제 검색 검증
-
-테스트가 없는 상태의 `test:run` 실패와 pre-push의 `--passWithNoTests` 예외는 [ADR-0008](./0008-ci-cd-and-git-hooks.md)에 구분했다. 루트 README의 기능·성능 완료 표현도 실제 구현과 검증 결과에 맞춰 후속 정리가 필요하다.
+Git 훅·CI의 검증 명령은 [ADR-0008](./0008-ci-cd-and-git-hooks.md), 필요한 자동 테스트와 실제 환경 검증의 범위는 [ADR-0012](./0012-testing-and-deployment-validation.md)를 따른다.
 
 현재 동작이나 테스트 결과를 기록할 때에는 이 설계 문서와 구분하고, 미실행을 통과로 표시하지 않는다.

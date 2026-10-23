@@ -19,7 +19,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cx(
-      'flex w-full items-center justify-between gap-2 whitespace-nowrap bg-palette-white outline-none disabled:opacity-50 [&>span]:truncate',
+      'flex w-full cursor-pointer items-center justify-between gap-2 whitespace-nowrap bg-palette-white outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate',
       variant === 'underline'
         ? 'h-10 rounded-none border-0 border-b border-ui-divider px-2 text-caption font-bold text-text-primary focus-visible:border-palette-primary'
         : 'h-9 rounded-sm border border-palette-gray px-3 text-body2 text-text-secondary focus:ring-2 focus:ring-palette-primary',
@@ -105,7 +105,7 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cx(
-      'relative flex w-full cursor-default select-none items-center outline-none focus:bg-palette-lightGray data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex w-full cursor-pointer select-none items-center outline-none focus:bg-palette-lightGray data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       variant === 'underline'
         ? 'h-9 px-2 text-caption focus:underline focus:decoration-palette-primary focus:decoration-2 focus:underline-offset-2'
         : 'rounded-sm py-2 pl-2 pr-8 text-body2',

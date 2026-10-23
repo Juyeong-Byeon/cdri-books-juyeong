@@ -1,3 +1,5 @@
+import { createBookSearchConfigurationError } from '../../server/createBookSearchConfigurationError';
+
 interface CloudflareEnv {
   KAKAO_REST_API_KEY?: string;
 }
@@ -23,12 +25,7 @@ export async function onRequestGet(context: CloudflareContext): Promise<Response
   const kakaoApiKey = context.env.KAKAO_REST_API_KEY;
 
   if (!kakaoApiKey) {
-    return new Response(JSON.stringify({ error: 'Book search API is not configured' }), {
-      status: 503,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-    });
+    return createBookSearchConfigurationError();
   }
 
   try {
