@@ -2,6 +2,8 @@
 
 **설계 문서: [ADR 모아보기](https://cdri.y-one.org/docs/adr/)**
 
+**성능·배포 검증: [PageSpeed 측정 및 실제 동작 확인](https://cdri.y-one.org/docs/performance/)**
+
 # 📚 CERTICOS BOOKS (cdri-books-juyeong)
 
 > **CDRI 프론트엔드 채용 사전과제**
@@ -57,7 +59,7 @@
 | **Routing**            | **React Router**                 |        v8         | - 검색·찜 경로와 브라우저 방문 기록 관리<br/>- `useSearchParams`로 확정 검색 조건을 URL에서 읽고 갱신                                                   |
 | **Styling & UI Core**  | **Tailwind CSS + Radix UI**      |    Tailwind v3    | - 디자인 토큰을 Tailwind 설정에 반영<br/>- 필요한 UI에 Radix UI 접근성 기반 구성요소 활용                                                               |
 | **Keyboard Shortcuts** | **Hotkeys.js**                   |        v4         | - 검색 기록의 방향키·Home·End 바인딩과 해제를 라이브러리에 위임<br/>- 목록에 포커스가 있을 때만 실행하고, 항목 간 포커스 이동 규칙은 페이지 훅에서 관리 |
-| **Icons**              | **Lucide React + 제공된 SVG**    |         -         | - 돋보기·화살표·닫기 등 공통 아이콘은 Lucide React 사용<br/>- 하트와 빈 상태 아이콘은 제공된 SVG로 디자인 반영                                          |
+| **Icons**              | **Lucide React + SVG**           |         -         | - 돋보기·화살표·닫기 등 공통 아이콘은 Lucide React 사용<br/>- 제공된 하트 SVG와 벡터로 정리한 빈 상태 아이콘으로 디자인 반영                            |
 | **Infrastructure**     | **Cloudflare Pages + Functions** |         -         | - 배포용 서버 프록시에서 카카오 인증 헤더 구성<br/>- 개발·배포에서 브라우저가 같은 출처의 `/api/books`를 호출하도록 구성                                |
 | **Testing**            | **Vitest + RTL + MSW**           | Vitest v3, MSW v2 | - 사용자 조작과 HTTP 요청 경계를 함께 검증<br/>- 실제 API 키 없이 오류·재시도·추가 페이지 응답 재현<br/>- 앱의 실제 Provider 설정으로 재시도 정책 검증  |
 | **Documentation**      | **VitePress**                    |        v1         | - 기존 Markdown에서 정적 문서·사이드바·검색 생성<br/>- 앱과 같은 Pages 배포에 포함하며 문서 본문을 따로 복사하지 않음                                   |
@@ -110,6 +112,8 @@ KAKAO_REST_API_KEY=your_kakao_rest_api_key_here
 
 `npm run dev`는 Vite를 `dev` 모드로 실행해 `.env.dev`를 읽습니다. 키를 변경하면 개발 서버를 재시작합니다. 키는 개발 서버가 카카오 요청의 인증 헤더를 구성할 때만 사용하며, 프런트엔드 코드나 `import.meta.env`에서 읽지 않습니다. 배포 시 Cloudflare Pages 프로젝트의 secret 변수에도 같은 이름(`KAKAO_REST_API_KEY`)으로 등록합니다.
 
+제출 시 별도로 전달한 `.env` 파일을 받았다면 프로젝트 루트에 그대로 두어도 `npm run dev`가 읽습니다. `.env.dev`가 함께 있으면 해당 파일의 값이 우선합니다. 두 파일 모두 Git 추적에서 제외합니다.
+
 개발·배포 모두 `GET /api/books`를 사용하며, 개발 프록시는 검색 쿼리를 유지한 채 카카오 `/v3/search/book`으로 전달합니다. 검색어 입력 후 Enter를 누르거나 상세검색에서 제목·저자명·출판사를 선택해 검색할 수 있습니다. 프록시의 설계 기준은 [ADR-0005](./docs/adr/0005-cors-proxy-cloudflare-pages.md)를 참고합니다.
 
 키가 없으면 개발·배포 모두 카카오를 호출하지 않고 HTTP 503과 `Book search API is not configured` 오류를 반환합니다. 이 응답은 공통 서버 함수에서 생성합니다.
@@ -157,7 +161,7 @@ SPA 경로는 [Pages의 기본 SPA fallback](https://developers.cloudflare.com/p
 
 ### 4.6 문서 사이트
 
-`npm run build`는 앱을 빌드한 뒤 VitePress 문서를 `dist/docs/`에 생성합니다. Pages의 빌드 명령과 출력 폴더는 4.5절 설정을 그대로 사용합니다. 배포 시 `/docs/`는 프로젝트 개요, `/docs/adr/`는 ADR 목록을 제공합니다.
+`npm run build`는 앱을 빌드한 뒤 VitePress 문서를 `dist/docs/`에 생성합니다. Pages의 빌드 명령과 출력 폴더는 4.5절 설정을 그대로 사용합니다. 배포 시 `/docs/`는 프로젝트 개요, `/docs/adr/`는 ADR 목록, `/docs/performance/`는 성능 측정과 공개 배포 검증 기록을 제공합니다.
 
 ```bash
 # 문서 개발 서버: http://localhost:5174/docs/
@@ -170,7 +174,7 @@ npm run docs:build
 npm run docs:preview
 ```
 
-본문은 루트 `README.md`와 `docs/adr/*.md`를 수정합니다. `docs/index.md`는 README를 포함하는 진입점이고, ADR 사이드바는 파일의 제목에서 자동으로 생성합니다. 코드 파일 링크는 GitHub 원문으로 연결합니다. 검색·문서 내 목차·이전/다음 문서·화면 모드는 VitePress 기본 테마를 사용합니다. 자세한 선택 이유는 [ADR-0013](./docs/adr/0013-documentation-site.md)을 참고합니다.
+프로젝트 설명은 루트 `README.md`, 설계 결정은 `docs/adr/*.md`, 측정 결과·캡처는 `docs/performance/`에서 관리합니다. `docs/index.md`는 README를 포함하는 진입점이고, ADR 사이드바는 파일의 제목에서 자동으로 생성합니다. 코드 파일 링크는 GitHub 원문으로 연결합니다. 검색·문서 내 목차·이전/다음 문서·화면 모드는 VitePress 기본 테마를 사용합니다. 자세한 선택 이유는 [ADR-0013](./docs/adr/0013-documentation-site.md)을 참고합니다.
 
 ---
 
@@ -183,12 +187,15 @@ cdri-books-juyeong/
 ├── docs/
 │   ├── .vitepress/config.ts  # 문서 사이트·자동 사이드바·링크 변환
 │   ├── index.md              # 루트 README 포함
-│   └── adr/                  # 아키텍처 결정 기록 원본
+│   ├── adr/                  # 아키텍처 결정 기록 원본
+│   └── performance/          # PageSpeed·공개 배포 검증 기록과 캡처
 ├── functions/
 │   └── api/
 │       └── books.ts          # Cloudflare Pages 엣지 프록시 함수 (API Key 은닉 & CORS 방지)
 ├── server/
 │   └── createBookSearchConfigurationError.ts # 개발·배포의 키 누락 응답
+├── public/
+│   └── robots.txt            # 크롤러에 제공하는 정적 규칙
 ├── src/
 │   ├── providers/
 │   │   ├── ContentErrorBoundary.tsx # 콘텐츠 렌더링 오류 복구 경계
@@ -352,6 +359,11 @@ cdri-books-juyeong/
 
 - Hotkeys.js로 방향키·Home·End를 바인딩하고 목록이 닫히면 해제합니다. 목록 안에서만 포커스 이동을 실행하며, 한글 조합 중에는 무시합니다.
 - 기록이 더 이어질 때만 하단 그라데이션을 표시해 스크롤 가능 여부를 알려줍니다.
+
+### 9. 측정 근거를 남긴 성능 개선
+
+- PageSpeed 보고서에서 확인한 폰트 CSS 중복·빈 상태 아이콘의 내장 PNG·크롤링 응답·텍스트 대비를 개선했습니다.
+- 개선 전 보고서와 재배포 후 재측정 결과를 구분하고, 공개 환경의 검색·저장·경로 복원 확인과 남은 한계를 [성능·배포 검증 기록](./docs/performance/index.md)에 남겼습니다. 선택 이유와 대안은 [ADR-0014](./docs/adr/0014-pagespeed-guided-improvements.md)에 정리했습니다.
 
 ---
 
