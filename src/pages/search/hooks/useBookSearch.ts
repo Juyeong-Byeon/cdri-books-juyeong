@@ -42,28 +42,50 @@ export function useBookSearch(conditions: BookSearchConditions) {
   const loadMore = useCallback(() => {
     if (canLoadMore) void fetchNextPage({ cancelRefetch: false });
   }, [canLoadMore, fetchNextPage]);
-  const retry = () => {
+  const retry = useCallback(() => {
     refetch({ cancelRefetch: false });
-  };
-  const retryNextPage = () => {
+  }, [refetch]);
+  const retryNextPage = useCallback(() => {
     if (hasNextPage && !isFetching) void fetchNextPage({ cancelRefetch: false });
-  };
+  }, [fetchNextPage, hasNextPage, isFetching]);
+  const totalCount = data?.pages[0]?.meta.totalCount ?? 0;
+  const isLoading = !isIdle && isPending;
+  const isEmpty = !isIdle && isSuccess && books.length === 0;
 
-  return {
-    books,
-    totalCount: data?.pages[0]?.meta.totalCount ?? 0,
-    isIdle,
-    isLoading: !isIdle && isPending,
-    isEmpty: !isIdle && isSuccess && books.length === 0,
-    error,
-    isError,
-    isFetching,
-    isFetchingNextPage,
-    isFetchNextPageError,
-    hasNextPage,
-    canLoadMore,
-    loadMore,
-    retry,
-    retryNextPage,
-  };
+  return useMemo(
+    () => ({
+      books,
+      totalCount,
+      isIdle,
+      isLoading,
+      isEmpty,
+      error,
+      isError,
+      isFetching,
+      isFetchingNextPage,
+      isFetchNextPageError,
+      hasNextPage,
+      canLoadMore,
+      loadMore,
+      retry,
+      retryNextPage,
+    }),
+    [
+      books,
+      totalCount,
+      isIdle,
+      isLoading,
+      isEmpty,
+      error,
+      isError,
+      isFetching,
+      isFetchingNextPage,
+      isFetchNextPageError,
+      hasNextPage,
+      canLoadMore,
+      loadMore,
+      retry,
+      retryNextPage,
+    ]
+  );
 }

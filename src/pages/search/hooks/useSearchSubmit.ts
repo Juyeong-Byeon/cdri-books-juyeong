@@ -10,11 +10,12 @@ export function useSearchSubmit(conditions: BookSearchConditions) {
   const queryClient = useQueryClient();
   const [, setSearchParams] = useSearchParams();
   const addSearchKeyword = useSearchHistoryStore((state) => state.addSearchKeyword);
+  const { searchKeyword: submittedSearchKeyword, target: submittedTarget, sort } = conditions;
   const canonicalSearch = serializeSearchConditions(conditions).toString();
 
   return useCallback(
     (searchKeyword: string, target?: BookSearchTarget) => {
-      const params = serializeSearchConditions({ ...conditions, searchKeyword, target });
+      const params = serializeSearchConditions({ searchKeyword, target, sort });
       if (searchKeyword) {
         addSearchKeyword(searchKeyword);
       }
@@ -22,7 +23,15 @@ export function useSearchSubmit(conditions: BookSearchConditions) {
       if (params.toString() === canonicalSearch) {
         if (searchKeyword) {
           void queryClient.refetchQueries(
-            { queryKey: getBookSearchQueryKey(conditions), exact: true, type: 'active' },
+            {
+              queryKey: getBookSearchQueryKey({
+                searchKeyword: submittedSearchKeyword,
+                target: submittedTarget,
+                sort,
+              }),
+              exact: true,
+              type: 'active',
+            },
             { cancelRefetch: false }
           );
         }
@@ -30,6 +39,14 @@ export function useSearchSubmit(conditions: BookSearchConditions) {
         setSearchParams(params);
       }
     },
-    [addSearchKeyword, canonicalSearch, conditions, queryClient, setSearchParams]
+    [
+      addSearchKeyword,
+      canonicalSearch,
+      submittedSearchKeyword,
+      submittedTarget,
+      sort,
+      queryClient,
+      setSearchParams,
+    ]
   );
 }

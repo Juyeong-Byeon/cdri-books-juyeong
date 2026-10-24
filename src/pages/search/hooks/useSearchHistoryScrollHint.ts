@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 export function useSearchHistoryScrollHint(searchKeywords: readonly string[]) {
   const listRef = useRef<HTMLUListElement>(null);
@@ -22,5 +22,8 @@ export function useSearchHistoryScrollHint(searchKeywords: readonly string[]) {
     return () => observer.disconnect();
   }, [searchKeywords, updateScrollHint]);
 
-  return { listRef, hasMoreBelow, updateScrollHint };
+  return useMemo(
+    () => ({ listRef, hasMoreBelow, updateScrollHint }),
+    [listRef, hasMoreBelow, updateScrollHint]
+  );
 }

@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from 'react';
 import { useSearchHistoryStore } from '@/stores/searchHistory/store';
 
 interface UseSearchInputOptions {
@@ -13,7 +21,8 @@ export function useSearchInput({ initialSearchKeyword, onSearch }: UseSearchInpu
   const removeSearchKeyword = useSearchHistoryStore((state) => state.removeSearchKeyword);
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isHistoryVisible = isHistoryOpen && searchKeywords.length > 0;
+  const hasSearchHistory = searchKeywords.length > 0;
+  const isHistoryVisible = isHistoryOpen && hasSearchHistory;
 
   useEffect(() => {
     if (!isHistoryVisible) return;
@@ -32,64 +41,95 @@ export function useSearchInput({ initialSearchKeyword, onSearch }: UseSearchInpu
     };
   }, [isHistoryVisible]);
 
-  function openHistory() {
+  const openHistory = useCallback(() => {
     setIsHistoryOpen(true);
-  }
+  }, []);
 
-  function focusInput() {
+  const focusInput = useCallback(() => {
     inputRef.current?.focus();
-  }
+  }, []);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsHistoryOpen(false);
-    onSearch(searchKeyword.trim());
-  }
+  const handleSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setIsHistoryOpen(false);
+      onSearch(searchKeyword.trim());
+    },
+    [onSearch, searchKeyword]
+  );
 
-  function handleSelectKeyword(keyword: string) {
-    setSearchKeyword(keyword);
-    focusInput();
-    setIsHistoryOpen(false);
-    onSearch(keyword);
-  }
+  const handleSelectKeyword = useCallback(
+    (keyword: string) => {
+      setSearchKeyword(keyword);
+      focusInput();
+      setIsHistoryOpen(false);
+      onSearch(keyword);
+    },
+    [focusInput, onSearch]
+  );
 
-  function handleRemoveKeyword(keyword: string) {
-    focusInput();
-    removeSearchKeyword(keyword);
-  }
+  const handleRemoveKeyword = useCallback(
+    (keyword: string) => {
+      focusInput();
+      removeSearchKeyword(keyword);
+    },
+    [focusInput, removeSearchKeyword]
+  );
 
-  function handleInputKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    if (event.nativeEvent.isComposing || event.key !== 'ArrowDown' || searchKeywords.length === 0)
-      return;
+  const handleInputKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.nativeEvent.isComposing || event.key !== 'ArrowDown' || !hasSearchHistory) return;
 
-    event.preventDefault();
-    setIsHistoryOpen(true);
-    requestAnimationFrame(() => {
-      formRef.current?.querySelector<HTMLButtonElement>('[data-history-select]')?.focus();
-    });
-  }
+      event.preventDefault();
+      setIsHistoryOpen(true);
+      requestAnimationFrame(() => {
+        formRef.current?.querySelector<HTMLButtonElement>('[data-history-select]')?.focus();
+      });
+    },
+    [hasSearchHistory]
+  );
 
-  function handleKeyDown(event: KeyboardEvent<HTMLFormElement>) {
-    if (event.nativeEvent.isComposing || event.key !== 'Escape' || !isHistoryVisible) return;
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLFormElement>) => {
+      if (event.nativeEvent.isComposing || event.key !== 'Escape' || !isHistoryVisible) return;
 
-    event.preventDefault();
-    focusInput();
-    setIsHistoryOpen(false);
-  }
+      event.preventDefault();
+      focusInput();
+      setIsHistoryOpen(false);
+    },
+    [focusInput, isHistoryVisible]
+  );
 
-  return {
-    searchKeyword,
-    setSearchKeyword,
-    searchKeywords,
-    isHistoryVisible,
-    formRef,
-    inputRef,
-    openHistory,
-    focusInput,
-    handleSubmit,
-    handleSelectKeyword,
-    handleRemoveKeyword,
-    handleInputKeyDown,
-    handleKeyDown,
-  };
+  return useMemo(
+    () => ({
+      searchKeyword,
+      setSearchKeyword,
+      searchKeywords,
+      isHistoryVisible,
+      formRef,
+      inputRef,
+      openHistory,
+      focusInput,
+      handleSubmit,
+      handleSelectKeyword,
+      handleRemoveKeyword,
+      handleInputKeyDown,
+      handleKeyDown,
+    }),
+    [
+      searchKeyword,
+      setSearchKeyword,
+      searchKeywords,
+      isHistoryVisible,
+      formRef,
+      inputRef,
+      openHistory,
+      focusInput,
+      handleSubmit,
+      handleSelectKeyword,
+      handleRemoveKeyword,
+      handleInputKeyDown,
+      handleKeyDown,
+    ]
+  );
 }
