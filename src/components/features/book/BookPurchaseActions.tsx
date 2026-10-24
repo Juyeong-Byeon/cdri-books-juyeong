@@ -57,14 +57,14 @@ export function BookPurchaseActions({ book, expanded }: BookPurchaseActionsProps
       <dl className={cx('flex flex-col items-end gap-3')}>
         {hasDiscount && (
           <div className={cx('flex items-center gap-2')}>
-            <dt className={cx('text-small text-text-subtitle')}>원가</dt>
+            <dt className={cx('text-small text-text-secondary')}>원가</dt>
             <dd className={cx('text-caption text-text-primary')}>
               <s>{formatPrice(book.price)}</s>
             </dd>
           </div>
         )}
         <div className={cx('flex items-center gap-2')}>
-          <dt className={cx('text-small text-text-subtitle')}>
+          <dt className={cx('text-small text-text-secondary')}>
             {hasDiscount ? '할인가' : '판매가'}
           </dt>
           <dd className={cx('text-title3 text-text-primary')}>{formatPrice(displayPrice)}</dd>

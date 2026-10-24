@@ -33,21 +33,22 @@
 
 모든 문서의 설계 상태는 승인 (Accepted)이다. 결정·개정 일자는 각 문서에서 관리한다.
 
-| 번호                                                 | 결정                                      |
-| ---------------------------------------------------- | ----------------------------------------- |
-| [0001](./0001-framework-vite-react.md)               | Vite + React + TypeScript 유지            |
-| [0002](./0002-styling-tailwind-css.md)               | Tailwind·Radix 기반 UI와 상세검색 Popover |
-| [0003](./0003-server-state-react-query.md)           | 제출 기반 검색과 React Query 무한 스크롤  |
-| [0004](./0004-client-state-zustand.md)               | Zustand 영속 상태의 범위와 스냅샷 정책    |
-| [0005](./0005-cors-proxy-cloudflare-pages.md)        | /api/books 서버 프록시와 키 주입          |
-| [0006](./0006-dto-domain-mapping-layer.md)           | DTO·도메인·매퍼와 별도 표시 포맷          |
-| [0007](./0007-component-and-hook-layering.md)        | 범용 UI·도메인 바인딩과 검색 훅 계약      |
-| [0008](./0008-ci-cd-and-git-hooks.md)                | 기존 훅·CI 유지와 검증 명령               |
-| [0009](./0009-ux-resilience-and-testing-strategy.md) | 구현 범위·디자인·접근성                   |
-| [0010](./0010-url-search-state-and-history.md)       | URL 단일 기준과 브라우저 방문 기록        |
-| [0011](./0011-query-errors-and-render-boundary.md)   | API 오류 UI와 렌더링 경계                 |
-| [0012](./0012-testing-and-deployment-validation.md)  | 핵심 자동 테스트와 실제 환경 검증         |
-| [0013](./0013-documentation-site.md)                 | 원본 Markdown 기반 문서 사이트 동시 배포  |
+| 번호                                                 | 결정                                          |
+| ---------------------------------------------------- | --------------------------------------------- |
+| [0001](./0001-framework-vite-react.md)               | Vite + React + TypeScript 유지                |
+| [0002](./0002-styling-tailwind-css.md)               | Tailwind·Radix 기반 UI와 상세검색 Popover     |
+| [0003](./0003-server-state-react-query.md)           | 제출 기반 검색과 React Query 무한 스크롤      |
+| [0004](./0004-client-state-zustand.md)               | Zustand 영속 상태의 범위와 스냅샷 정책        |
+| [0005](./0005-cors-proxy-cloudflare-pages.md)        | /api/books 서버 프록시와 키 주입              |
+| [0006](./0006-dto-domain-mapping-layer.md)           | DTO·도메인·매퍼와 별도 표시 포맷              |
+| [0007](./0007-component-and-hook-layering.md)        | 범용 UI·도메인 바인딩과 검색 훅 계약          |
+| [0008](./0008-ci-cd-and-git-hooks.md)                | 기존 훅·CI 유지와 검증 명령                   |
+| [0009](./0009-ux-resilience-and-testing-strategy.md) | 구현 범위·디자인·접근성                       |
+| [0010](./0010-url-search-state-and-history.md)       | URL 단일 기준과 브라우저 방문 기록            |
+| [0011](./0011-query-errors-and-render-boundary.md)   | API 오류 UI와 렌더링 경계                     |
+| [0012](./0012-testing-and-deployment-validation.md)  | 핵심 자동 테스트와 실제 환경 검증             |
+| [0013](./0013-documentation-site.md)                 | 원본 Markdown 기반 문서 사이트 동시 배포      |
+| [0014](./0014-pagespeed-guided-improvements.md)      | PageSpeed 근거로 자산·크롤링·텍스트 대비 개선 |
 
 ## 구현과 검증 현황
 

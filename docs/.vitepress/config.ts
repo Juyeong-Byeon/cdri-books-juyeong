@@ -68,6 +68,7 @@ export default defineConfig({
     nav: [
       { text: '프로젝트', link: '/' },
       { text: 'ADR', link: '/adr/' },
+      { text: '성능 측정', link: '/performance/' },
       { text: '앱 열기', link: 'https://cdri.y-one.org' },
     ],
     sidebar: [
@@ -76,6 +77,7 @@ export default defineConfig({
         items: [
           { text: '프로젝트 개요', link: '/' },
           { text: '설계 결정 목록', link: '/adr/' },
+          { text: '성능 측정 기록', link: '/performance/' },
         ],
       },
       { text: '아키텍처 결정 기록', items: adrSidebar },

@@ -39,7 +39,7 @@ export function SearchLoadMore({
             {isFetchingNextPage ? '도서를 불러오는 중…' : '더 불러오기'}
           </Button>
         ) : (
-          <p role="status" className={cx('text-body2 text-text-subtitle')}>
+          <p role="status" className={cx('text-body2 text-text-secondary')}>
             모든 도서를 불러왔습니다.
           </p>
         ))}

@@ -8,7 +8,8 @@ export function FavoritesCount() {
     <p aria-live="polite" className={cx('flex items-center gap-3 text-body2 text-text-primary')}>
       <span>찜한 책</span>
       <span>
-        총 <strong className={cx('text-body2-bold text-palette-primary')}>{totalCount}</strong>건
+        총{' '}
+        <strong className={cx('text-body2-bold text-palette-primaryStrong')}>{totalCount}</strong>건
       </span>
     </p>
   );

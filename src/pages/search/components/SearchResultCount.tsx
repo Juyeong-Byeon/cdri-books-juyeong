@@ -16,7 +16,9 @@ export function SearchResultCount({ totalCount, isLoading = false }: SearchResul
         <span>검색 중…</span>
       ) : (
         <span>
-          총 <strong className={cx('text-body2-bold text-palette-primary')}>{totalCount}</strong>건
+          총{' '}
+          <strong className={cx('text-body2-bold text-palette-primaryStrong')}>{totalCount}</strong>
+          건
         </span>
       )}
     </p>

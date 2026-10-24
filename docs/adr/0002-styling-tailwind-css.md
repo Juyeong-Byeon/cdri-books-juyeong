@@ -1,7 +1,7 @@
 # ADR-0002: Tailwind CSS 토큰과 Radix 기반 UI, 상세검색 Popover 채택
 
 - **상태**: 승인 (Accepted)
-- **결정·개정 일자**: 2026-10-23
+- **결정·개정 일자**: 2026-10-24
 - **결정자**: 변주영
 
 ## 배경
@@ -11,6 +11,7 @@
 ## 결정
 
 - 디자인에서 정한 색상·타이포그래피를 제품 코드의 토큰으로 관리한다. 컴포넌트에서는 해당 토큰의 Tailwind 클래스를 사용하며, 문서에 같은 값의 사본을 유지하지 않는다.
+- 일반 크기 텍스트와 흰색 버튼 글자는 배경과 충분한 대비를 갖도록 `primaryStrong`과 보조 텍스트 토큰을 적용한다. 원본 `primary`는 탐색 메뉴·포커스 표시에 유지한다. 변경 이유는 [ADR-0014](./0014-pagespeed-guided-improvements.md), 계산한 대비율은 [PageSpeed 측정 기록](../performance/index.md)에 둔다.
 - 타이포그래피 값은 `src/lib/typography.ts`에 선언하고, Tailwind의 `fontSize`와 `cx`의 글자 크기 판별이 이 정의를 공유한다. 사용자 정의 글자 크기를 글자색과 함께 병합해도 제거되지 않게 한다.
 - Tailwind CSS의 토큰과 shadcn/ui 방식의 소스 소유 구조를 유지한다. 접근성 동작이 필요한 UI는 Radix 프리미티브를 활용한다.
 - 상세검색은 버튼에 연결된 Popover와 검색 대상 선택 입력으로 구현한다. 중앙 Dialog는 사용하지 않는다.
@@ -26,7 +27,7 @@
 | 타이포그래피               | [typography.ts](../../src/lib/typography.ts)   | Tailwind `fontSize`와 `cx`가 같은 정의 사용 |
 | 클래스 병합                | [utils.ts](../../src/lib/utils.ts)             | 크기 토큰과 글자색을 함께 병합              |
 
-색상은 `palette`·`text`·`ui`로 나누어 사용한다. 예를 들어 버튼은 `bg-palette-primary`, 본문은 `text-text-secondary`, 목록 구분선은 `border-ui-divider`를 사용한다. 타이포그래피는 `text-title2`, `text-title3`, `text-body2`, `text-caption`처럼 역할별 토큰으로 지정한다.
+색상은 `palette`·`text`·`ui`로 나누어 사용한다. 예를 들어 기본 버튼은 `bg-palette-primaryStrong`, 본문은 `text-text-secondary`, 목록 구분선은 `border-ui-divider`를 사용한다. 타이포그래피는 `text-title2`, `text-title3`, `text-body2`, `text-caption`처럼 역할별 토큰으로 지정한다.
 
 토큰 값이 바뀌면 제품 코드의 정의를 수정한다. 문서의 숫자 표와 코드를 수동으로 맞추는 절차는 두지 않는다.
 
